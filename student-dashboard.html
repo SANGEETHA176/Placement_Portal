@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireX | Student Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary-purple: #6d28d2; 
+            --heading-blue: #1a3353;
+            --chart-green: #499e73;
+        }
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; color: var(--heading-blue); overflow-x: hidden; }
+        
+        /* Grid Entrance Animations */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-grid { opacity: 0; animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* Sidebar Styling */
+        .sidebar-item { border-left: 4px solid transparent; transition: all 0.3s ease; }
+        .sidebar-item:hover { background-color: #f5f3ff; color: var(--primary-purple); }
+        .sidebar-item.active { border-left-color: var(--primary-purple); background-color: #f5f3ff; color: var(--primary-purple); font-weight: 700; }
+
+        /* Enhanced Explore Button */
+        .btn-explore-large {
+            padding: 10px 30px;
+            font-size: 1rem;
+            font-weight: 800;
+            background-color: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .btn-explore-large:hover { 
+            background-color: var(--primary-purple); 
+            color: white; 
+            border-color: var(--primary-purple);
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px -5px rgba(109, 40, 210, 0.3);
+        }
+
+        /* Performance Bars */
+        .bar { width: 40px; background-color: var(--chart-green); border-radius: 6px; transition: height 1.5s ease-out; }
+        
+        /* Modals */
+        #profile-setup, #edit-modal-overlay { position: fixed; inset: 0; background: rgba(248, 250, 252, 0.95); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+        #edit-modal-overlay { display: none; background: rgba(0,0,0,0.4); }
+        #resume-preview-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(8px); }
+    </style>
+</head>
+<body class="flex">
+
+    <div id="profile-setup">
+        <div class="bg-white p-10 rounded-[30px] shadow-2xl w-[450px] border border-gray-100 animate-grid">
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-black mb-1">Complete Your Profile</h2>
+                <p class="text-gray-400 text-sm">Enter your details to access HireX</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1 mb-1 block">Full Name</label>
+                    <input type="text" id="setup-name" placeholder="Jane Doe" class="w-full p-3.5 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1 mb-1 block">Department</label>
+                    <input type="text" id="setup-dept" placeholder="Computer Science" class="w-full p-3.5 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black text-gray-400 uppercase ml-1 mb-1 block">Registration No</label>
+                    <input type="text" id="setup-reg" placeholder="2024CS001" class="w-full p-3.5 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                </div>
+                <button onclick="saveProfile(true)" class="w-full py-4 bg-[#6d28d2] text-white rounded-xl font-black text-lg hover:bg-purple-700 transition-all shadow-lg mt-2">
+                    Launch Dashboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-modal-overlay">
+        <div class="bg-white p-10 rounded-[30px] shadow-2xl w-[450px] animate-grid">
+            <h2 class="text-2xl font-black mb-6">Update Profile</h2>
+            <div class="space-y-4">
+                <input type="text" id="edit-name" class="w-full p-3.5 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                <input type="text" id="edit-dept" class="w-full p-3.5 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                <input type="text" id="edit-reg" class="w-full p-3.5 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
+                <div class="flex gap-3 mt-4">
+                    <button onclick="closeProfileEdit()" class="flex-1 py-3 bg-gray-100 rounded-xl font-bold">Cancel</button>
+                    <button onclick="saveProfile(false)" class="flex-1 py-3 bg-[#6d28d2] text-white rounded-xl font-bold">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside class="w-72 h-screen bg-white border-r border-gray-100 flex flex-col fixed left-0 top-0 z-50">
+        <div class="p-8">
+            <h1 class="text-2xl font-black text-[#1a3353] flex items-center gap-2">
+                <i data-lucide="graduation-cap" class="text-purple-500" size="28"></i> HireX
+            </h1>
+        </div>
+        <nav class="flex-1 space-y-1 overflow-y-auto px-2">
+            <div class="sidebar-item active px-6 py-4 flex items-center gap-4 cursor-pointer">
+                <i data-lucide="layout-grid" size="20"></i> <span class="text-sm">Overview</span>
+            </div>
+            <div class="sidebar-item px-6 py-4 flex items-center gap-4 cursor-pointer">
+                <i data-lucide="brain" size="20"></i> <span class="text-sm">Aptitude Practice</span>
+            </div>
+            <div class="sidebar-item px-6 py-4 flex items-center gap-4 cursor-pointer">
+                <i data-lucide="code-2" size="20"></i> <span class="text-sm">Programming</span>
+            </div>
+            <div class="sidebar-item px-6 py-4 flex items-center gap-4 cursor-pointer">
+                <i data-lucide="clipboard-check" size="20"></i> <span class="text-sm">Mock Tests</span>
+            </div>
+            <div class="sidebar-item px-6 py-4 flex items-center gap-4 cursor-pointer">
+                <i data-lucide="bar-chart-3" size="20"></i> <span class="text-sm">Performance</span>
+            </div>
+            <div class="sidebar-item px-6 py-4 flex items-center gap-4 cursor-pointer">
+                <i data-lucide="check-square" size="20"></i> <span class="text-sm">Daily To-Do</span>
+            </div>
+            <div class="sidebar-item px-6 py-4 flex items-center gap-4 cursor-pointer">
+                <i data-lucide="file-text" size="20"></i> <span class="text-sm">Resume Building</span>
+            </div>
+        </nav>
+        <div class="p-8 border-t border-gray-50 space-y-4">
+            <div class="flex items-center gap-3 cursor-pointer text-gray-500 hover:text-purple-600 font-bold text-sm">
+                <i data-lucide="home" size="18"></i> Back to Home
+            </div>
+            <div class="flex items-center gap-3 cursor-pointer text-red-500 font-black text-sm">
+                <i data-lucide="log-out" size="18"></i> Logout
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 ml-72 min-h-screen">
+        <header class="h-20 bg-white/90 backdrop-blur-xl border-b border-gray-100 flex items-center justify-between px-10 sticky top-0 z-40">
+            <h2 class="text-xl font-black">Student Dashboard</h2>
+            <div class="flex items-center gap-6">
+                <i data-lucide="search" class="text-gray-400 hover:text-purple-600 cursor-pointer transition"></i>
+                <div class="flex items-center gap-4 border-l pl-6">
+                    <div class="text-right">
+                        <p id="nav-name" class="font-black text-xs">Student Name</p>
+                        <p id="nav-reg" class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">REG NO</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-xl bg-[#6d28d2] text-white flex items-center justify-center font-black text-base" id="avatar-initial">S</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-8 space-y-8">
+            <div class="grid grid-cols-12 gap-8">
+                <div class="col-span-8 bg-white rounded-[32px] p-10 border border-gray-100 shadow-sm animate-grid delay-1 relative">
+                    <button onclick="openProfileEdit()" class="absolute top-8 right-8 flex items-center gap-2 px-4 py-2 bg-purple-50 text-purple-600 rounded-full font-black text-[10px] hover:bg-purple-100 transition">
+                        <i data-lucide="user-cog" size="12"></i> EDIT PROFILE
+                    </button>
+                    <h3 class="text-3xl font-black mb-1">Welcome, <span id="welcome-name" class="text-[#6d28d2]">Student</span>!</h3>
+                    <p class="text-gray-400 text-sm font-medium">What would you like to learn today?</p>
+                    
+                    <div class="mt-8 flex items-center gap-6 p-6 bg-slate-50 rounded-[24px] w-fit">
+                        <div class="w-16 h-16 rounded-2xl bg-white shadow-md flex items-center justify-center text-2xl font-black text-[#6d28d2]" id="card-initial">S</div>
+                        <div>
+                            <h4 id="display-name" class="font-black text-xl">Full Name</h4>
+                            <p class="text-gray-500 font-bold text-sm mt-1">
+                                <span id="display-dept">Department</span> • <span id="display-reg" class="text-[#6d28d2]">REG NO</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-span-4 bg-[#1a3353] rounded-[32px] p-8 text-white text-center animate-grid delay-2 flex flex-col justify-between">
+                    <div>
+                        <h4 class="font-black text-xl mb-1">AI interview Preparation</h4>
+                        <p class="text-blue-200 text-xs">Mock interview simulator.</p>
+                    </div>
+                    <div class="py-4"><i data-lucide="bot" size="50" class="mx-auto text-purple-400"></i></div>
+                    <button class="w-full py-3.5 bg-[#6d28d2] rounded-xl font-black text-sm hover:scale-105 transition-transform shadow-lg">
+                        START SESSION
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-8">
+                <div class="bg-white border border-gray-100 rounded-[32px] p-8 flex flex-col justify-between h-[280px] shadow-sm animate-grid delay-3">
+                    <div class="flex justify-between items-start">
+                        <h5 class="font-black text-xl">Aptitude<br>Practice</h5>
+                        <div class="p-3 bg-blue-50 text-blue-500 rounded-2xl"><i data-lucide="brain" size="24"></i></div>
+                    </div>
+                    <p class="text-gray-400 text-xs font-medium">Logical & Verbal reasoning.</p>
+                    <button class="btn-explore-large self-start">EXPLORE</button>
+                </div>
+                <div class="bg-white border border-gray-100 rounded-[32px] p-8 flex flex-col justify-between h-[280px] shadow-sm animate-grid delay-1">
+                    <div class="flex justify-between items-start">
+                        <h5 class="font-black text-xl">Programming<br>Practice</h5>
+                        <div class="p-3 bg-green-50 text-green-500 rounded-2xl"><i data-lucide="code" size="24"></i></div>
+                    </div>
+                    <p class="text-gray-400 text-xs font-medium">Python, Java, and C++.</p>
+                    <button class="btn-explore-large self-start">EXPLORE</button>
+                </div>
+                <div class="bg-white border border-gray-100 rounded-[32px] p-8 flex flex-col justify-between h-[280px] shadow-sm animate-grid delay-2">
+                    <div class="flex justify-between items-start">
+                        <h5 class="font-black text-xl">Mock<br>Tests</h5>
+                        <div class="p-3 bg-purple-50 text-purple-500 rounded-2xl"><i data-lucide="clipboard-list" size="24"></i></div>
+                    </div>
+                    <p class="text-gray-400 text-xs font-medium">Simulation exams.</p>
+                    <button class="btn-explore-large self-start">EXPLORE</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-8">
+                <div class="col-span-7 bg-white rounded-[32px] p-10 border border-gray-100 animate-grid delay-3">
+                    <h4 class="font-black text-xl mb-8">Performance Tracking</h4>
+                    <div class="flex items-end justify-between h-40 px-6">
+                        <div class="flex flex-col items-center gap-3"><div class="bar h-[75%]"></div><span class="text-[9px] font-black text-gray-400">APTITUDE</span></div>
+                        <div class="flex flex-col items-center gap-3"><div class="bar h-[60%]"></div><span class="text-[9px] font-black text-gray-400">CODING</span></div>
+                        <div class="flex flex-col items-center gap-3"><div class="bar h-[90%]"></div><span class="text-[9px] font-black text-gray-400">MOCKS</span></div>
+                        <div class="flex flex-col items-center gap-3"><div class="bar h-[50%]"></div><span class="text-[9px] font-black text-gray-400">AI PREP</span></div>
+                        <div class="flex flex-col items-center gap-3"><div class="bar h-[85%]"></div><span class="text-[9px] font-black text-gray-400">COURSE</span></div>
+                    </div>
+                </div>
+
+                <div class="col-span-5 bg-white rounded-[32px] p-10 border border-gray-100 flex flex-col animate-grid delay-1">
+                    <h4 class="font-black text-xl mb-6">Daily To-Do List</h4>
+                    <div id="todo-container" class="flex-1 space-y-3 overflow-y-auto max-h-48 mb-4 pr-2"></div>
+                    <div class="flex gap-2">
+                        <input type="text" id="todo-input" placeholder="Next task..." class="flex-1 px-4 py-3 bg-gray-50 border rounded-xl outline-none focus:ring-2 focus:ring-purple-200 font-bold text-sm">
+                        <button onclick="addNewTodo()" class="p-3 bg-[#6d28d2] text-white rounded-xl shadow-md hover:scale-105 transition-transform"><i data-lucide="plus" size="20"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="animate-grid delay-2">
+                <h4 class="font-black text-xl mb-6">Resume Building</h4>
+                <div class="grid grid-cols-4 gap-8">
+                    <div class="border-2 border-dashed border-gray-200 rounded-[32px] flex flex-col items-center justify-center text-gray-300 hover:text-purple-600 hover:border-purple-200 hover:bg-purple-50 transition-all cursor-pointer h-48">
+                        <i data-lucide="plus-circle" size="40"></i>
+                        <span class="font-black text-sm mt-2">New Draft</span>
+                    </div>
+                    <div onclick="openResumePreview()" class="bg-white border border-purple-100 rounded-[32px] p-6 flex flex-col justify-between h-48 hover:shadow-xl hover:-translate-y-2 transition-all cursor-pointer group">
+                        <div class="flex items-center gap-4">
+                            <div class="p-3 bg-purple-50 text-[#6d28d2] rounded-xl group-hover:bg-[#6d28d2] group-hover:text-white transition-colors"><i data-lucide="file-text" size="24"></i></div>
+                            <span class="font-black text-sm text-gray-700">resume_v1</span>
+                        </div>
+                        <span class="text-[9px] font-black text-purple-600 bg-purple-50 px-4 py-2 rounded-full w-fit group-hover:bg-purple-600 group-hover:text-white transition-all uppercase tracking-widest">PREVIEW</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="resume-preview-modal" onclick="this.style.display='none'">
+        <div class="bg-white w-[600px] h-[80vh] p-16 rounded-[40px] shadow-2xl relative overflow-y-auto" onclick="event.stopPropagation()">
+            <h1 id="res-name-view" class="text-4xl font-black text-[#1a3353] border-b-4 border-purple-600 pb-6 mb-8 uppercase">NAME</h1>
+            <div class="grid grid-cols-2 gap-10">
+                <div class="space-y-4">
+                    <h3 class="font-black text-purple-600 text-sm uppercase border-b pb-1">Education</h3>
+                    <p id="res-dept-view" class="font-black text-base text-gray-800">Dept</p>
+                </div>
+            </div>
+            <button onclick="document.getElementById('resume-preview-modal').style.display='none'" class="absolute top-8 right-8 text-gray-300 hover:text-red-500"><i data-lucide="x-circle" size="32"></i></button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        function saveProfile(isSetup) {
+            const name = document.getElementById(isSetup ? 'setup-name' : 'edit-name').value;
+            const dept = document.getElementById(isSetup ? 'setup-dept' : 'edit-dept').value;
+            const reg = document.getElementById(isSetup ? 'setup-reg' : 'edit-reg').value;
+
+            if(!name || !dept || !reg) return alert("Please fill all details!");
+
+            updateDashboard(name, dept, reg);
+            document.getElementById('profile-setup').style.display = 'none';
+            document.getElementById('edit-modal-overlay').style.display = 'none';
+        }
+
+        function openProfileEdit() {
+            document.getElementById('edit-name').value = document.getElementById('display-name').innerText;
+            document.getElementById('edit-dept').value = document.getElementById('display-dept').innerText;
+            document.getElementById('edit-reg').value = document.getElementById('display-reg').innerText;
+            document.getElementById('edit-modal-overlay').style.display = 'flex';
+        }
+
+        function closeProfileEdit() {
+            document.getElementById('edit-modal-overlay').style.display = 'none';
+        }
+
+        function updateDashboard(name, dept, reg) {
+            const initial = name.charAt(0).toUpperCase();
+            document.getElementById('welcome-name').innerText = name.split(' ')[0];
+            document.getElementById('display-name').innerText = name;
+            document.getElementById('display-dept').innerText = dept;
+            document.getElementById('display-reg').innerText = reg;
+            document.getElementById('nav-name').innerText = name;
+            document.getElementById('nav-reg').innerText = reg;
+            document.getElementById('avatar-initial').innerText = initial;
+            document.getElementById('card-initial').innerText = initial;
+            document.getElementById('res-name-view').innerText = name;
+            document.getElementById('res-dept-view').innerText = dept;
+        }
+
+        function openResumePreview() { document.getElementById('resume-preview-modal').style.display = 'flex'; }
+
+        function addNewTodo() {
+            const input = document.getElementById('todo-input');
+            if(!input.value.trim()) return;
+            const container = document.getElementById('todo-container');
+            const item = document.createElement('div');
+            item.className = "flex items-center justify-between p-4 bg-slate-50 rounded-xl group hover:border-purple-200 border border-transparent transition-all animate-grid";
+            item.innerHTML = `
+                <div class="flex items-center gap-3">
+                    <input type="checkbox" class="w-5 h-5 accent-purple-600">
+                    <span class="font-bold text-gray-700 text-sm task-text">${input.value}</span>
+                </div>
+                <button onclick="this.parentElement.remove()" class="text-red-400 opacity-0 group-hover:opacity-100 transition-all"><i data-lucide="trash-2" size="16"></i></button>
+            `;
+            container.prepend(item);
+            input.value = "";
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
