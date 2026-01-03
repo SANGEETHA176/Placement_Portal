@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProExam Pilot | Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .sidebar-panel { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
+        .sidebar-panel.open { transform: translateX(0); }
+        .type-btn { border: 1px solid #e2e8f0; transition: all 0.2s; }
+        .type-btn.active { border: 2px solid #3f51b5; background-color: #f5f7ff; color: #3f51b5; }
+        .ai-box { background: linear-gradient(to right, #f5f7ff, #ffffff); border: 1px solid #e0e7ff; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <aside class="w-64 bg-[#1e1e2d] text-gray-400 flex flex-col shrink-0">
+        <div class="p-6 flex items-center gap-3 text-white">
+            <div class="bg-indigo-600 p-2 rounded-lg"><i data-lucide="graduation-cap" class="w-6 h-6"></i></div>
+            <span class="font-bold text-xl tracking-tight">HireX</span>
+        </div>
+
+        <div class="px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-gray-500">Main Menu</div>
+        <nav class="px-4 space-y-1 mb-6">
+            <a href="#" class="bg-[#3f51b5] text-white flex items-center gap-3 px-4 py-3 rounded-lg text-sm">
+                <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Overview
+            </a>
+        </nav>
+
+        <div class="px-6 py-2 text-[10px] font-bold uppercase tracking-widest text-gray-500">Departments</div>
+        <nav class="flex-1 px-4 space-y-1 overflow-y-auto">
+            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm hover:bg-gray-800 transition">
+                <i data-lucide="code" class="w-4 h-4"></i> CSC
+            </button>
+            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm hover:bg-gray-800 transition">
+                <i data-lucide="palette" class="w-4 h-4"></i> IT
+            </button>
+            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm hover:bg-gray-800 transition">
+                <i data-lucide="megaphone" class="w-4 h-4"></i> ECE
+            </button>
+            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm hover:bg-gray-800 transition">
+                <i data-lucide="banknote" class="w-4 h-4"></i> AIDS
+            </button>
+        </nav>
+
+        <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-xs font-bold">AU</div>
+                <div class="text-xs">
+                    <p class="text-white font-medium leading-none">Admin User</p>
+                    <span class="text-[10px] text-gray-500">Super Admin</span>
+                </div>
+            </div>
+            <i data-lucide="log-out" class="w-4 h-4 cursor-pointer hover:text-white"></i>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col bg-slate-50 overflow-y-auto">
+        <header class="px-8 py-6 flex justify-between items-center bg-white border-b border-slate-200">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">Engineering Dashboard</h1>
+                <p class="text-sm text-slate-500">Real-time performance metrics</p>
+            </div>
+            <button onclick="toggleModal(true)" class="bg-[#3f51b5] hover:bg-[#303f9f] text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-medium shadow-lg transition-all active:scale-95">
+                <i data-lucide="plus" class="w-5 h-5"></i> Assign Test
+            </button>
+        </header>
+
+        <div class="p-8 space-y-8">
+            <div class="grid grid-cols-4 gap-6">
+                <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm relative overflow-hidden">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2 bg-blue-50 text-blue-600 rounded-lg"><i data-lucide="users" class="w-5 h-5"></i></div>
+                        <span class="text-emerald-500 text-[10px] font-bold bg-emerald-50 px-2 py-1 rounded">+12%</span>
+                    </div>
+                    <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Total Students</p>
+                    <h3 class="text-3xl font-bold text-slate-800">1,254</h3>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2 bg-purple-50 text-purple-600 rounded-lg"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+                        <span class="text-emerald-500 text-[10px] font-bold bg-emerald-50 px-2 py-1 rounded">+50</span>
+                    </div>
+                    <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Tests Assigned Till Date</p>
+                    <h3 class="text-3xl font-bold text-slate-800">230</h3>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2 bg-orange-50 text-orange-600 rounded-lg"><i data-lucide="clock" class="w-5 h-5"></i></div>
+                        <span class="text-emerald-500 text-[10px] font-bold bg-emerald-50 px-2 py-1 rounded">+19%</span>
+                    </div>
+                    <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Avg. Completion</p>
+                    <h3 class="text-3xl font-bold text-slate-800">85.4%</h3>
+                </div>
+                <div class="bg-white p-6 rounded-xl border border-slate-100 shadow-sm">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></div>
+                        <span class="text-emerald-500 text-[10px] font-bold bg-emerald-50 px-2 py-1 rounded">+2%</span>
+                    </div>
+                    <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider">Avg. Score</p>
+                    <h3 class="text-3xl font-bold text-slate-800">82%</h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6">
+                <div class="col-span-8 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
+                    <h3 class="font-bold text-slate-800 mb-8">Performance Analytics</h3>
+                    <div class="h-80"><canvas id="perfChart"></canvas></div>
+                </div>
+                <div class="col-span-4 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center">
+                    <div class="w-48 h-48 mb-6 relative">
+                        <canvas id="targetChart"></canvas>
+                    </div>
+                    <h3 class="font-bold text-slate-800 text-lg">Weekly Target</h3>
+                    <p class="text-sm text-slate-500 px-4">You have reached 85% of your student completion goal.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0 pointer-events-none z-50 flex justify-end transition-opacity duration-300" onclick="toggleModal(false)">
+        <div id="sidebarPanel" class="sidebar-panel w-full max-w-lg bg-white h-full shadow-2xl flex flex-col pointer-events-auto" onclick="event.stopPropagation()">
+            
+            <div class="p-8 border-b border-slate-100">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-slate-800">Assign Test</h2>
+                    <button onclick="toggleModal(false)" class="p-2 hover:bg-slate-100 rounded-full transition"><i data-lucide="x" class="w-5 h-5 text-slate-400"></i></button>
+                </div>
+                <p class="text-slate-400 text-sm mt-1">AI will auto-select questions based on your topics.</p>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-8 space-y-8">
+                <div class="space-y-4">
+                    <label class="text-sm font-bold text-slate-700">Assessment Type</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="setTab('aptitude')" id="tab-aptitude" class="type-btn active p-4 rounded-xl flex flex-col items-center gap-2">
+                            <i data-lucide="brain" class="w-5 h-5"></i>
+                            <span class="text-[11px] font-bold uppercase tracking-wider">Aptitude</span>
+                        </button>
+                        <button onclick="setTab('technical')" id="tab-technical" class="type-btn p-4 rounded-xl flex flex-col items-center gap-2">
+                            <i data-lucide="terminal" class="w-5 h-5"></i>
+                            <span class="text-[11px] font-bold uppercase tracking-wider">Technical</span>
+                        </button>
+                        <button onclick="setTab('mock')" id="tab-mock" class="type-btn p-4 rounded-xl flex flex-col items-center gap-2">
+                            <i data-lucide="clipboard-check" class="w-5 h-5"></i>
+                            <span class="text-[11px] font-bold uppercase tracking-wider">Mock Test</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <label class="text-sm font-bold text-slate-700">Select Focus Topics</label>
+                    <div id="topics-container" class="space-y-3">
+                        </div>
+                </div>
+
+                <div class="ai-box p-5 rounded-2xl space-y-3">
+                    <div class="flex items-center gap-2 text-[#3f51b5]">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        <span class="text-sm font-bold">AI Question Assigner</span>
+                    </div>
+                    <p class="text-xs text-indigo-400 leading-relaxed">
+                        AI will fetch <span class="font-bold">20 unique questions</span> per selected topic, tailored to current student performance levels.
+                    </p>
+                    <div class="flex items-center gap-3 pt-2">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase">Difficulty:</span>
+                        <select class="text-xs font-bold bg-white border border-slate-200 rounded-md px-2 py-1 outline-none">
+                            <option>Adaptive</option>
+                            <option>Beginner</option>
+                            <option>Expert</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-700">Schedule Date</label>
+                        <input type="date" class="w-full border border-slate-200 rounded-lg p-3 text-sm bg-slate-50 outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-bold text-slate-700">Duration (Mins)</label>
+                        <input type="number" value="60" class="w-full border border-slate-200 rounded-lg p-3 text-sm bg-slate-50 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-8 border-t border-slate-100">
+                <button class="w-full bg-[#3f51b5] text-white py-4 rounded-xl font-bold shadow-xl shadow-indigo-100 flex items-center justify-center gap-2">
+                    Generate & Assign Test <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        // Topic Data
+        const topics = {
+            aptitude: [
+                { title: 'Logical Reasoning', sub: 'Syllogism, Blood Relations' },
+                { title: 'Quantitative Aptitude', sub: 'Algebra, Arithmetic' },
+                { title: 'Verbal Ability', sub: 'Grammar, Comprehension' }
+            ],
+            technical: [
+                { title: 'Java Development', sub: 'OOPs, Collections' },
+                { title: 'C++ ', sub: 'Pointers, Memory Mgmt' },
+                { title: 'JavaScript', sub: 'ES6, Async/Await' }
+            ],
+            mock: [{ title: 'Full Length Mock', sub: 'Core Technical + Aptitude' }]
+        };
+
+        function toggleModal(show) {
+            const overlay = document.getElementById('modalOverlay');
+            const panel = document.getElementById('sidebarPanel');
+            if (show) {
+                overlay.classList.remove('opacity-0', 'pointer-events-none');
+                panel.classList.add('open');
+                setTab('aptitude');
+            } else {
+                overlay.classList.add('opacity-0', 'pointer-events-none');
+                panel.classList.remove('open');
+            }
+        }
+
+        function setTab(cat) {
+            document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${cat}`).classList.add('active');
+            
+            document.getElementById('topics-container').innerHTML = topics[cat].map(t => `
+                <label class="flex items-center gap-4 p-4 border border-slate-100 rounded-xl cursor-pointer hover:bg-slate-50 transition">
+                    <input type="checkbox" class="w-5 h-5 text-indigo-600 accent-indigo-600 rounded">
+                    <div>
+                        <p class="text-sm font-bold text-slate-700">${t.title}</p>
+                        <p class="text-[10px] text-slate-400 font-medium">${t.sub}</p>
+                    </div>
+                </label>
+            `).join('');
+        }
+
+        // Charts
+        window.onload = () => {
+            const ctx1 = document.getElementById('perfChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Logical', 'Verbal', 'java script', 'C++', 'Java', 'Mock Test',],
+                    datasets: [{
+                        data: [75, 62, 85, 92, 78, 88],
+                        backgroundColor: '#3f51b5',
+                        borderRadius: 6,
+                        barThickness: 32
+                    }]
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { beginAtZero: true, max: 100, grid: { borderDash: [5, 5] } }, x: { grid: { display: false } } }
+                }
+            });
+
+            const ctx2 = document.getElementById('targetChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: { datasets: [{ data: [85, 15], backgroundColor: ['#3f51b5', '#f1f5f9'], borderWidth: 0 }] },
+                options: { cutout: '82%', plugins: { tooltip: { enabled: false } } }
+            });
+        };
+    </script>
+</body>
+</html>

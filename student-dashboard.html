@@ -14,7 +14,6 @@
         }
         body { background-color: #f4f7fe; font-family: 'Inter', sans-serif; color: var(--heading-navy); overflow-x: hidden; }
         
-        /* React-style Smooth Transitions */
         .transition-all-custom { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
         @keyframes fadeInUp {
@@ -23,68 +22,86 @@
         }
         .animate-grid { opacity: 0; animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
-        /* Card Interaction States */
+        /* Card States */
         .practice-card { transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; position: relative; overflow: hidden; }
         .practice-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1); }
-        
-        .practice-card.active {
-            background-color: var(--primary-indigo) !important;
-            transform: scale(1.02);
-            box-shadow: 0 20px 25px -5px rgba(63, 81, 181, 0.2);
-        }
+        .practice-card.active { background-color: var(--primary-indigo) !important; transform: scale(1.02); }
         .practice-card.active h5, .practice-card.active p { color: white !important; }
         .practice-card.active .btn-explore-large { background-color: white; color: var(--primary-indigo); border-color: white; }
 
-        /* Sidebar Navigation States */
+        /* Sidebar Nav */
         .sidebar-item { border-left: 4px solid transparent; transition: all 0.2s ease; color: #94a3b8; cursor: pointer; }
         .sidebar-item:hover { background-color: rgba(255,255,255,0.05); color: white; }
         .sidebar-item.active { border-left-color: white; background-color: var(--primary-indigo); color: white; font-weight: 700; }
 
-        .btn-explore-large {
-            padding: 10px 30px;
-            font-size: 1rem;
-            font-weight: 800;
-            background-color: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            transition: all 0.2s ease;
-        }
+        .btn-explore-large { padding: 10px 30px; font-size: 1rem; font-weight: 800; background-color: white; border: 2px solid #e2e8f0; border-radius: 12px; transition: all 0.2s ease; }
 
-        /* Reactive Graph Styles */
+        /* Performance Bars */
         .bar-container { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; flex: 1; }
         .bar { width: 40px; background-color: var(--primary-indigo); border-radius: 6px 6px 0 0; transition: height 1.5s cubic-bezier(0.34, 1.56, 0.64, 1); height: 0; position: relative; }
         .reading { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 900; color: var(--primary-indigo); opacity: 0; transition: opacity 0.5s ease 1s; }
         
-        #profile-setup { position: fixed; inset: 0; background: rgba(248, 250, 252, 0.98); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        /* Overlays */
+        #profile-setup { position: fixed; inset: 0; background: rgba(248, 250, 252, 0.98); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px); transition: opacity 0.3s ease; }
+        
+        /* IMPROVED RESUME MODAL */
+        #resume-modal { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.9); z-index: 2000; flex-direction: column; align-items: center; padding: 40px 20px; overflow-y: auto; backdrop-filter: blur(8px); }
+        .resume-container { background: white; width: 100%; max-width: 800px; border-radius: 8px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; margin-top: 60px; }
+        .resume-image { width: 100%; height: auto; border-radius: 8px; display: block; }
+        .modal-nav { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: #1e1e2d; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 2100; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+
+        /* Resume Building Card Styles */
+        .pulse-border { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { border-color: #e2e8f0; }
+            50% { border-color: #3f51b5; box-shadow: 0 0 15px rgba(63, 81, 181, 0.2); }
+            100% { border-color: #e2e8f0; }
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
     </style>
 </head>
 <body class="flex">
 
+    <div id="resume-modal">
+        <div class="modal-nav">
+            <h3 class="text-white font-black flex items-center gap-2 uppercase tracking-widest text-sm">
+                <i data-lucide="file-text" class="text-indigo-400"></i> <span id="modal-filename">Resume Preview</span>
+            </h3>
+            <button onclick="closeResume()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-xl font-bold transition-all active:scale-95 shadow-lg">
+                <i data-lucide="arrow-left" size="18"></i> Back to Dashboard
+            </button>
+        </div>
+        <div class="resume-container animate-grid">
+            <img id="resume-preview-img" src="resume.png" alt="Resume Template" class="resume-image">
+        </div>
+        <div class="py-10 text-white/30 text-xs font-bold uppercase tracking-widest text-center">End of Preview</div>
+    </div>
+
     <div id="profile-setup">
         <div class="bg-white p-10 rounded-[40px] shadow-2xl w-[450px] border border-gray-100 animate-grid">
             <div class="mb-8 text-center">
-                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <i data-lucide="user-plus" size="32"></i>
-                </div>
-                <h2 class="text-2xl font-black mb-1">Get Started</h2>
-                <p class="text-gray-400 text-sm">Create your student profile</p>
+                <div class="w-16 h-16 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4"><i data-lucide="user-plus" size="32"></i></div>
+                <h2 class="text-2xl font-black mb-1" id="setup-title">Get Started</h2>
+                <p class="text-gray-400 text-sm">Update your student profile</p>
             </div>
             <div class="space-y-4">
                 <input type="text" id="setup-name" placeholder="Full Name" class="w-full p-4 bg-gray-50 border rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                 <input type="text" id="setup-dept" placeholder="Department (e.g., IT)" class="w-full p-4 bg-gray-50 border rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
                 <input type="text" id="setup-reg" placeholder="Registration No" class="w-full p-4 bg-gray-50 border rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
-                <button onclick="saveProfile()" class="w-full py-4 bg-[#3f51b5] text-white rounded-2xl font-black text-lg shadow-lg hover:bg-indigo-700 transition-all active:scale-95">Launch Dashboard</button>
+                <button onclick="saveProfile()" class="w-full py-4 bg-[#3f51b5] text-white rounded-2xl font-black text-lg shadow-lg hover:bg-indigo-700 transition-all active:scale-95">Save Changes</button>
             </div>
         </div>
     </div>
 
     <aside class="w-72 h-screen bg-[#1e1e2d] flex flex-col fixed left-0 top-0 z-50">
         <div class="p-8">
-            <h1 class="text-2xl font-black text-white flex items-center gap-2">
-                <i data-lucide="graduation-cap" class="text-indigo-400"></i> HireX
-            </h1>
+            <h1 class="text-2xl font-black text-white flex items-center gap-2"><i data-lucide="graduation-cap" class="text-indigo-400"></i> HireX</h1>
         </div>
-        <nav class="flex-1 space-y-1 px-2" id="sidebar-nav">
+        <nav class="flex-1 space-y-1 px-2">
             <div class="sidebar-item active px-6 py-4 flex items-center gap-4" onclick="setActiveNav(this)"><i data-lucide="layout-grid" size="20"></i> <span class="text-sm">Overview</span></div>
             <div class="sidebar-item px-6 py-4 flex items-center gap-4" onclick="setActiveNav(this)"><i data-lucide="brain" size="20"></i> <span class="text-sm">Aptitude Practice</span></div>
             <div class="sidebar-item px-6 py-4 flex items-center gap-4" onclick="setActiveNav(this)"><i data-lucide="code-2" size="20"></i> <span class="text-sm">Programming</span></div>
@@ -94,24 +111,25 @@
             <div class="sidebar-item px-6 py-4 flex items-center gap-4" onclick="setActiveNav(this)"><i data-lucide="file-text" size="20"></i> <span class="text-sm">Resume Building</span></div>
         </nav>
         <div class="p-8 border-t border-white/5 space-y-4">
-            <div class="flex items-center gap-3 cursor-pointer text-gray-500 hover:text-indigo-400 font-bold text-sm transition-colors">
-                <i data-lucide="home" size="18"></i> Back to Home
-            </div>
-            <div onclick="location.reload()" class="flex items-center gap-3 cursor-pointer text-red-400 font-black text-sm hover:text-red-300 transition-colors">
-                <i data-lucide="log-out" size="18"></i> Logout
-            </div>
+            <div onclick="window.location.href='home.html'" class="flex items-center gap-3 cursor-pointer text-gray-500 hover:text-indigo-400 font-bold text-sm transition-colors"><i data-lucide="home" size="18"></i> Back to Home</div>
+            <div onclick="logoutUser()" class="flex items-center gap-3 cursor-pointer text-red-400 font-black text-sm hover:text-red-300 transition-colors"><i data-lucide="log-out" size="18"></i> Logout</div>
         </div>
     </aside>
 
     <main class="flex-1 ml-72 min-h-screen">
         <header class="h-20 bg-white border-b border-gray-100 flex items-center justify-between px-10 sticky top-0 z-40">
             <h2 class="text-xl font-black">Student Dashboard</h2>
-            <div class="flex items-center gap-4 text-right">
-                <div class="hidden sm:block">
-                    <p id="nav-name" class="font-black text-xs text-slate-700 tracking-tight">Student Name</p>
-                    <p id="nav-reg" class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">REG NO</p>
+            <div class="flex items-center gap-6">
+                <button onclick="editProfile()" class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-indigo-600 bg-indigo-50 px-4 py-2 rounded-xl hover:bg-indigo-600 hover:text-white transition-all">
+                    <i data-lucide="user-cog" size="14"></i> Edit Profile
+                </button>
+                <div class="flex items-center gap-4 text-right border-l pl-6 border-gray-100">
+                    <div class="hidden sm:block">
+                        <p id="nav-name" class="font-black text-xs text-slate-700 tracking-tight">Student Name</p>
+                        <p id="nav-reg" class="text-[9px] text-gray-400 font-bold uppercase tracking-widest">REG NO</p>
+                    </div>
+                    <div class="w-11 h-11 rounded-2xl bg-[#3f51b5] text-white flex items-center justify-center font-black shadow-inner" id="avatar-initial">S</div>
                 </div>
-                <div class="w-11 h-11 rounded-2xl bg-[#3f51b5] text-white flex items-center justify-center font-black shadow-inner" id="avatar-initial">S</div>
             </div>
         </header>
 
@@ -124,47 +142,23 @@
                     </div>
                     <i data-lucide="sparkles" size="80" class="text-indigo-50 group-hover:rotate-12 transition-transform duration-500"></i>
                 </div>
+            </div>
 
-                <div class="col-span-12 grid grid-cols-3 gap-8 animate-grid" style="animation-delay: 0.1s;">
-                    <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:border-indigo-100 transition-all">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Full Name</p>
-                        <h4 id="display-name" class="font-black text-xl text-[#3f51b5]">Name</h4>
-                    </div>
-                    <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:border-indigo-100 transition-all">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Branch</p>
-                        <h4 id="display-dept" class="font-black text-xl text-slate-700">Dept</h4>
-                    </div>
-                    <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:border-indigo-100 transition-all">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Reg No</p>
-                        <h4 id="display-reg" class="font-black text-xl text-slate-700">REG NO</h4>
-                    </div>
-                </div>
+            <div class="grid grid-cols-3 gap-8 animate-grid" style="animation-delay: 0.1s;">
+                <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm"><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Full Name</p><h4 id="display-name" class="font-black text-xl text-[#3f51b5]">Name</h4></div>
+                <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm"><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Branch</p><h4 id="display-dept" class="font-black text-xl text-slate-700">Dept</h4></div>
+                <div class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm"><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Reg No</p><h4 id="display-reg" class="font-black text-xl text-slate-700">REG NO</h4></div>
             </div>
 
             <div class="grid grid-cols-3 gap-8">
                 <div onclick="handleCardClick(this)" class="practice-card bg-white border border-gray-100 rounded-[40px] p-8 flex flex-col justify-between h-[300px] shadow-sm animate-grid" style="animation-delay: 0.2s;">
-                    <div>
-                        <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 icon-box"><i data-lucide="brain" size="24"></i></div>
-                        <h5 class="font-black text-2xl">Aptitude<br>Practice</h5>
-                        <p class="text-xs text-gray-400 mt-2">Logical & Verbal reasoning modules.</p>
-                    </div>
-                    <button class="btn-explore-large self-start">EXPLORE</button>
+                    <div><div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 icon-box"><i data-lucide="brain" size="24"></i></div><h5 class="font-black text-2xl">Aptitude<br>Practice</h5><p class="text-xs text-gray-400 mt-2">Logical & Verbal reasoning modules.</p></div><button class="btn-explore-large self-start">EXPLORE</button>
                 </div>
                 <div onclick="handleCardClick(this)" class="practice-card bg-white border border-gray-100 rounded-[40px] p-8 flex flex-col justify-between h-[300px] shadow-sm animate-grid" style="animation-delay: 0.3s;">
-                    <div>
-                        <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 icon-box"><i data-lucide="code-2" size="24"></i></div>
-                        <h5 class="font-black text-2xl">Programming<br>Practice</h5>
-                        <p class="text-xs text-gray-400 mt-2">Master Python, Java, and C++.</p>
-                    </div>
-                    <button class="btn-explore-large self-start">EXPLORE</button>
+                    <div><div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 icon-box"><i data-lucide="code-2" size="24"></i></div><h5 class="font-black text-2xl">Programming<br>Practice</h5><p class="text-xs text-gray-400 mt-2">Master Python, Java, and C++.</p></div><button class="btn-explore-large self-start">EXPLORE</button>
                 </div>
                 <div onclick="handleCardClick(this)" class="practice-card bg-white border border-gray-100 rounded-[40px] p-8 flex flex-col justify-between h-[300px] shadow-sm animate-grid" style="animation-delay: 0.4s;">
-                    <div>
-                        <div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 icon-box"><i data-lucide="clipboard-check" size="24"></i></div>
-                        <h5 class="font-black text-2xl">Mock<br>Tests</h5>
-                        <p class="text-xs text-gray-400 mt-2">Real-world exam simulations.</p>
-                    </div>
-                    <button class="btn-explore-large self-start">EXPLORE</button>
+                    <div><div class="w-12 h-12 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mb-6 icon-box"><i data-lucide="clipboard-check" size="24"></i></div><h5 class="font-black text-2xl">Mock<br>Tests</h5><p class="text-xs text-gray-400 mt-2">Real-world exam simulations.</p></div><button class="btn-explore-large self-start">EXPLORE</button>
                 </div>
             </div>
 
@@ -172,36 +166,47 @@
                 <div class="col-span-7 bg-white rounded-[40px] p-10 border border-gray-100 animate-grid" style="animation-delay: 0.5s;">
                     <h4 class="font-black text-xl mb-8 flex items-center gap-2"><i data-lucide="bar-chart-2" class="text-indigo-600"></i> Performance Tracking</h4>
                     <div class="flex items-end justify-between h-40 px-6 border-b border-gray-50 pb-2">
-                        <div class="bar-container"><div class="bar" data-h="75%"><span class="reading">75%</span></div><span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mt-3">Aptitude</span></div>
-                        <div class="bar-container"><div class="bar" data-h="60%"><span class="reading">60%</span></div><span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mt-3">Coding</span></div>
-                        <div class="bar-container"><div class="bar" data-h="90%"><span class="reading">90%</span></div><span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mt-3">Mocks</span></div>
-                        <div class="bar-container"><div class="bar" data-h="82%"><span class="reading">82%</span></div><span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mt-3">Attendance</span></div>
-                        <div class="bar-container"><div class="bar" data-h="85%"><span class="reading">85%</span></div><span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter mt-3">Course</span></div>
+                        <div class="bar-container"><div class="bar" data-h="75%"><span class="reading">75%</span></div><span class="text-[10px] font-black text-gray-400 uppercase mt-3">Aptitude</span></div>
+                        <div class="bar-container"><div class="bar" data-h="60%"><span class="reading">60%</span></div><span class="text-[10px] font-black text-gray-400 uppercase mt-3">Coding</span></div>
+                        <div class="bar-container"><div class="bar" data-h="90%"><span class="reading">90%</span></div><span class="text-[10px] font-black text-gray-400 uppercase mt-3">Mocks</span></div>
+                        <div class="bar-container"><div class="bar" data-h="82%"><span class="reading">82%</span></div><span class="text-[10px] font-black text-gray-400 uppercase mt-3">Attendance</span></div>
+                        <div class="bar-container"><div class="bar" data-h="85%"><span class="reading">85%</span></div><span class="text-[10px] font-black text-gray-400 uppercase mt-3">Course</span></div>
                     </div>
                 </div>
                 <div class="col-span-5 bg-white rounded-[40px] p-10 border border-gray-100 animate-grid flex flex-col" style="animation-delay: 0.6s;">
                     <h4 class="font-black text-xl mb-6 flex items-center gap-2"><i data-lucide="list-todo" class="text-indigo-600"></i> Daily Tasks</h4>
-                    <div id="todo-container" class="flex-1 space-y-3 mb-4 max-h-48 overflow-y-auto"></div>
+                    <div id="todo-container" class="flex-1 space-y-3 mb-4 max-h-48 overflow-y-auto pr-2"></div>
                     <div class="flex gap-2">
-                        <input type="text" id="todo-input" placeholder="What's next?" class="flex-1 px-4 py-3 bg-gray-50 border rounded-2xl outline-none text-sm font-bold focus:ring-2 focus:ring-indigo-100 transition-all">
+                        <input type="text" id="todo-input" placeholder="What's next?" class="flex-1 px-4 py-3 bg-gray-50 border rounded-2xl outline-none text-sm font-bold">
                         <button onclick="addNewTodo()" class="p-3 bg-[#3f51b5] text-white rounded-2xl shadow-md active:scale-90 transition-transform"><i data-lucide="plus" size="20"></i></button>
                     </div>
                 </div>
             </div>
 
             <div class="animate-grid" style="animation-delay: 0.7s;">
-                <h4 class="font-black text-xl mb-6">Resume Building</h4>
-                <div class="grid grid-cols-4 gap-8">
-                    <div class="border-2 border-dashed border-gray-200 rounded-[40px] flex flex-col items-center justify-center text-gray-300 hover:text-indigo-400 hover:border-indigo-200 transition-all cursor-pointer h-48 group">
-                        <i data-lucide="plus-circle" size="40" class="group-hover:scale-110 transition-transform"></i>
-                        <span class="font-black text-sm mt-2">New Draft</span>
+                <div class="flex items-center justify-between mb-6">
+                    <h4 class="font-black text-xl">Resume Vault</h4>
                     </div>
-                    <div class="bg-white border border-indigo-100 rounded-[40px] p-6 h-48 flex flex-col justify-between hover:shadow-xl transition-all group cursor-pointer">
-                        <div class="flex items-center gap-4">
-                            <div class="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><i data-lucide="file-text" size="24"></i></div>
-                            <span class="font-black text-sm">resume_v1.pdf</span>
+                
+                <div class="grid grid-cols-4 gap-8" id="resume-grid">
+                    <input type="file" id="resume-upload" class="hidden" onchange="handleFileSelect(event)" accept="image/*,application/pdf">
+                    
+                    <div onclick="triggerUpload()" class="pulse-border border-2 border-dashed rounded-[40px] flex flex-col items-center justify-center text-gray-400 hover:text-indigo-600 hover:bg-indigo-50/30 transition-all cursor-pointer h-52 group">
+                        <div class="w-14 h-14 bg-gray-50 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i data-lucide="upload-cloud" size="28"></i>
                         </div>
-                        <span class="text-[9px] font-black text-indigo-600 bg-indigo-50 px-4 py-2 rounded-full w-fit group-hover:bg-indigo-600 group-hover:text-white transition-all">PREVIEW</span>
+                        <span class="font-black text-xs uppercase tracking-tighter">Click to Upload</span>
+                        <span class="text-[9px] font-bold text-gray-300 mt-1">PNG, JPG or PDF</span>
+                    </div>
+
+                    <div class="glass-card rounded-[40px] p-8 h-52 flex flex-col justify-between shadow-sm border-indigo-50 relative overflow-hidden group">
+                        <div class="absolute -right-4 -top-4 text-indigo-50 opacity-20 group-hover:scale-125 transition-transform"><i data-lucide="file-text" size="100"></i></div>
+                        <div>
+                            <div class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-indigo-200"><i data-lucide="layers" size="18"></i></div>
+                            <h5 class="font-black text-sm">System Template</h5>
+                            <p class="text-[10px] text-gray-400 font-bold uppercase">Professional Layout</p>
+                        </div>
+                        <button onclick="openResume('resume.png', 'System Template')" class="w-full py-2 bg-indigo-600 text-white rounded-full font-black text-[10px] hover:bg-indigo-700 transition-all">VIEW PREVIEW</button>
                     </div>
                 </div>
             </div>
@@ -210,6 +215,66 @@
 
     <script>
         lucide.createIcons();
+
+        function editProfile() {
+            // Populate fields with current data
+            document.getElementById('setup-name').value = document.getElementById('display-name').innerText;
+            document.getElementById('setup-dept').value = document.getElementById('display-dept').innerText;
+            document.getElementById('setup-reg').value = document.getElementById('display-reg').innerText;
+            
+            // Show overlay
+            document.getElementById('profile-setup').style.display = 'flex';
+            document.getElementById('profile-setup').style.opacity = '1';
+            document.getElementById('setup-title').innerText = "Edit Profile";
+        }
+
+        function triggerUpload() {
+            document.getElementById('resume-upload').click();
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    addResumeCard(file.name, e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addResumeCard(filename, imgSrc) {
+            const grid = document.getElementById('resume-grid');
+            const card = document.createElement('div');
+            card.className = "bg-white rounded-[40px] p-8 h-52 flex flex-col justify-between shadow-xl border border-indigo-50 animate-grid relative group overflow-hidden";
+            
+            card.innerHTML = `
+                <div class="absolute -right-2 -top-2 text-green-50"><i data-lucide="check-circle-2" size="80"></i></div>
+                <div>
+                    <div class="w-10 h-10 bg-green-500 text-white rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-green-100"><i data-lucide="file-check" size="18"></i></div>
+                    <h5 class="font-black text-sm truncate pr-4">${filename}</h5>
+                    <p class="text-[10px] text-green-600 font-bold uppercase">Cloud Saved</p>
+                </div>
+                <div class="flex gap-2 relative z-10">
+                    <button onclick="openResume('${imgSrc}', '${filename}')" class="flex-1 py-2 bg-gray-900 text-white rounded-full font-black text-[10px] hover:bg-black transition-all">VIEW</button>
+                    <button onclick="this.closest('.animate-grid').remove()" class="w-10 h-10 flex items-center justify-center bg-red-50 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition-all"><i data-lucide="trash-2" size="14"></i></button>
+                </div>
+            `;
+            grid.appendChild(card);
+            lucide.createIcons();
+        }
+
+        function openResume(src, name) {
+            document.body.style.overflow = 'hidden'; 
+            document.getElementById('resume-preview-img').src = src;
+            document.getElementById('modal-filename').innerText = name;
+            document.getElementById('resume-modal').style.display = 'flex';
+        }
+
+        function closeResume() {
+            document.body.style.overflow = 'auto'; 
+            document.getElementById('resume-modal').style.display = 'none';
+        }
 
         function setActiveNav(element) {
             document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
@@ -241,11 +306,11 @@
             document.getElementById('nav-name').innerText = name;
             document.getElementById('nav-reg').innerText = reg;
             document.getElementById('avatar-initial').innerText = name.charAt(0).toUpperCase();
+            
             document.getElementById('profile-setup').style.opacity = '0';
             
             setTimeout(() => {
                 document.getElementById('profile-setup').style.display = 'none';
-                // Trigger Graph Animation
                 document.querySelectorAll('.bar').forEach(bar => {
                     bar.style.height = bar.getAttribute('data-h');
                     bar.querySelector('.reading').style.opacity = '1';
@@ -253,16 +318,46 @@
             }, 300);
         }
 
+        function logoutUser() {
+            location.reload();
+        }
+
         function addNewTodo() {
             const input = document.getElementById('todo-input');
-            if(!input.value.trim()) return;
+            const text = input.value.trim();
+            if(!text) return;
             const container = document.getElementById('todo-container');
             const item = document.createElement('div');
             item.className = "flex items-center justify-between p-4 bg-slate-50 rounded-2xl group border border-transparent hover:border-indigo-100 transition-all animate-grid";
-            item.innerHTML = `<span class="font-bold text-gray-700 text-sm">${input.value}</span><button onclick="this.parentElement.remove()" class="text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"><i data-lucide="trash-2" size="16"></i></button>`;
+            item.innerHTML = `
+                <span class="todo-text font-bold text-gray-700 text-sm flex-1">${text}</span>
+                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button onclick="editTodo(this)" class="text-indigo-400"><i data-lucide="pencil" size="16"></i></button>
+                    <button onclick="this.closest('.animate-grid').remove()" class="text-red-400"><i data-lucide="trash-2" size="16"></i></button>
+                </div>`;
             container.prepend(item);
             input.value = "";
             lucide.createIcons();
+        }
+
+        function editTodo(btn) {
+            const item = btn.closest('.animate-grid');
+            const span = item.querySelector('.todo-text');
+            const currentText = span.innerText;
+            const input = document.createElement('input');
+            input.className = "flex-1 bg-white border border-indigo-200 rounded-lg px-2 py-1 text-sm font-bold outline-none";
+            input.value = currentText;
+            item.replaceChild(input, span);
+            input.focus();
+            const saveEdit = () => {
+                const newText = input.value.trim() || currentText;
+                const newSpan = document.createElement('span');
+                newSpan.className = "todo-text font-bold text-gray-700 text-sm flex-1";
+                newSpan.innerText = newText;
+                item.replaceChild(newSpan, input);
+            };
+            input.addEventListener('keydown', (e) => { if(e.key === 'Enter') saveEdit(); });
+            input.addEventListener('blur', saveEdit);
         }
     </script>
 </body>

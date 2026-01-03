@@ -236,11 +236,16 @@
                 sunIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
             }
         }
+   document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
 
+<<<<<<< HEAD
         // Form Submission logic
         document.getElementById('loginForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
+=======
+>>>>>>> acccf78ae5707ac462de2a3602e631e0a18d48d4
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
 
@@ -252,7 +257,10 @@
         window.location.href = "admin-dashboard.html";
     }
 });
+<<<<<<< HEAD
 
+=======
+>>>>>>> acccf78ae5707ac462de2a3602e631e0a18d48d4
     </script>
 </body>
 </html>
