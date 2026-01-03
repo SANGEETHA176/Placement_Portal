@@ -23,7 +23,6 @@
         }
         .animate-grid { opacity: 0; animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
-        /* --- PRACTICE CARD STATES --- */
         .practice-card { 
             transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); 
             cursor: pointer; 
@@ -236,13 +235,24 @@
         lucide.createIcons();
 
         function handleCardClick(element) {
-            document.querySelectorAll('.practice-card').forEach(card => {
-                card.classList.remove('active');
-            });
+            // Get the title of the clicked card
+            const title = element.querySelector('h5').innerText.toLowerCase();
+
+            // REDIRECTION LOGIC (This is the only part changed)
+            if (title.includes('aptitude')) {
+                window.location.href = 'apti.html';
+                return;
+            } else if (title.includes('programming')) {
+                window.location.href = 'prog.html';
+                return;
+            } else if (title.includes('mock')) {
+                window.location.href = 'mock.html';
+                return;
+            }
+
+            // Fallback for visual active state if no redirect happens
+            document.querySelectorAll('.practice-card').forEach(card => card.classList.remove('active'));
             element.classList.add('active');
-            document.getElementById('display-dept').style.color = "#3f51b5";
-            document.getElementById('display-reg').style.color = "#3f51b5";
-            document.getElementById('display-name').style.color = "#3f51b5";
         }
 
         function editProfile() {
