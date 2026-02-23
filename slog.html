@@ -184,64 +184,93 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    // 1. Added Firestore Imports
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk",
-            authDomain: "hirex-73d04.firebaseapp.com",
-            projectId: "hirex-73d04",
-            storageBucket: "hirex-73d04.firebasestorage.app",
-            messagingSenderId: "435154197357",
-            appId: "1:435154197357:web:5dbce3288c6a2771685864"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk",
+        authDomain: "hirex-73d04.firebaseapp.com",
+        projectId: "hirex-73d04",
+        storageBucket: "hirex-73d04.firebasestorage.app",
+        messagingSenderId: "435154197357",
+        appId: "1:435154197357:web:5dbce3288c6a2771685864"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app); // Initialize Firestore
 
-        const loginForm = document.getElementById('loginForm');
-        const errorDisplay = document.getElementById('error-message');
-        const loginBtn = document.getElementById('loginBtn');
+    const loginForm = document.getElementById('loginForm');
+    const errorDisplay = document.getElementById('error-message');
+    const loginBtn = document.getElementById('loginBtn');
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value.trim();
+        
+        loginBtn.innerText = "Verifying...";
+        loginBtn.disabled = true;
+        errorDisplay.style.display = 'none';
+
+        try {
+            // 1. Sign in with Email/Password
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+            // 2. Fetch User Role from Firestore
+            const userDoc = await getDoc(doc(db, "users", user.uid));
             
-            loginBtn.innerText = "Verifying...";
-            errorDisplay.style.display = 'none';
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
 
-           try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+                // 3. SECURITY GATE: Check Role and Email Verification
+                if (userData.role === "student") {
+                    if (user.emailVerified) {
+                        // SUCCESS: Both role and email are valid
+                        window.location.href = "student-dashboard.html";
+                    } else {
+                        // FAIL: Email not verified
+                        await signOut(auth);
+                        showError("Please verify your email address. Check your Gmail inbox!");
+                    }
+                } else {
+                    // FAIL: User is Faculty trying to log in as Student
+                    await signOut(auth);
+                    showError("Access Denied: This is a Student-only portal.");
+                }
+            } else {
+                await signOut(auth);
+                showError("User profile not found in database.");
+            }
 
-    if (user.emailVerified) {
-        // Success! Redirect to dashboard
-        window.location.href = "student-dashboard.html";
-    } else {
-        // NOT VERIFIED: Show error and sign them back out
-        await signOut(auth);
-        errorMsg.innerText = "Please verify your email address before logging in. Check your inbox!";
-        errorMsg.classList.remove('hidden');
+        } catch (error) {
+            loginBtn.innerText = "Secure Access";
+            loginBtn.disabled = false;
+            errorDisplay.style.display = 'block';
+            
+            // Detailed Error Messages
+            if (error.code === 'auth/invalid-credential') {
+                errorDisplay.innerText = "Invalid email or password.";
+            } else if (error.code === 'auth/too-many-requests') {
+                errorDisplay.innerText = "Too many attempts. Please try again later.";
+            } else {
+                errorDisplay.innerText = "Login failed: " + error.message;
+            }
+        }
+    });
+
+    // Helper function to handle UI reset on error
+    function showError(message) {
+        errorDisplay.innerText = message;
+        errorDisplay.style.display = 'block';
         loginBtn.innerText = "Secure Access";
         loginBtn.disabled = false;
     }
-} catch (error) {
-                // Handle Errors
-                loginBtn.innerText = "Secure Access";
-                errorDisplay.style.display = 'block';
-                
-                if (error.code === 'auth/invalid-credential') {
-                    errorDisplay.innerText = "Invalid email or password.";
-                } else if (error.code === 'auth/user-not-found') {
-                    errorDisplay.innerText = "Account not found.";
-                } else {
-                    errorDisplay.innerText = "Login failed. Please try again.";
-                }
-            }
-        });
 
-        lucide.createIcons();
-    </script>
+    lucide.createIcons();
+</script>
 </body>
 </html>
