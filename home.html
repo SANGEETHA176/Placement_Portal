@@ -27,7 +27,6 @@
             overflow-x: hidden;
         }
 
-        /* --- Background with back.png --- */
         .background-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -38,7 +37,6 @@
             z-index: -1;
         }
 
-        /* --- Navigation --- */
         .navbar {
             position: fixed; width: 100%; top: 0; z-index: 1000;
             background: rgba(10, 10, 10, 0.85);
@@ -47,7 +45,7 @@
         }
 
         .nav-container {
-            max-width: 1200px; margin: 0 auto; padding: 0.8rem 2rem;
+            max-width: 1500px; margin: 0 auto; padding: 0.8rem 2rem;
             display: flex; justify-content: space-between; align-items: center;
         }
 
@@ -62,7 +60,6 @@
         }
         .nav-links a:hover { opacity: 1; color: var(--brand-gold); }
 
-        /* --- Sections --- */
         .section { min-height: 100vh; padding: 120px 2rem 80px; max-width: 1200px; margin: 0 auto; }
         
         /* --- Hero --- */
@@ -70,14 +67,25 @@
         .hero-title { font-family: 'Playfair Display', serif; font-size: 7rem; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.8)); }
         .hero-subtitle { font-size: 1.25rem; margin-bottom: 3.5rem; letter-spacing: 5px; text-transform: uppercase; font-weight: 300; }
 
-        /* --- About Grid --- */
-        .about-section { display: flex; flex-direction: column; align-items: center; gap: 4rem; text-align: center; }
+        /* --- Expanded About Section --- */
+        .about-header { text-align: center; margin-bottom: 5rem; }
         .about-header h2 { font-family: 'Playfair Display', serif; font-size: 3.5rem; color: var(--brand-gold); margin-bottom: 1rem; }
-        .about-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; width: 100%; }
-        .about-card { background: rgba(20, 20, 20, 0.5); padding: 3rem 2rem; border: 1px solid var(--glass-border); border-radius: 8px; transition: 0.4s; }
-        .about-card:hover { transform: translateY(-10px); background: rgba(30, 30, 30, 0.8); }
+        .about-header p { color: var(--text-muted); font-size: 1.1rem; max-width: 700px; margin: 0 auto; line-height: 1.8; }
 
-        /* --- Portal Containers & Image Color Effect --- */
+        .mission-vision { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 6rem; }
+        .mission-box { background: rgba(212, 175, 55, 0.05); padding: 3rem; border: 1px solid var(--glass-border); border-radius: 4px; }
+        .mission-box h3 { color: var(--brand-gold); margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+
+        .about-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; width: 100%; margin-bottom: 6rem;}
+        .about-card { background: rgba(20, 20, 20, 0.5); padding: 3rem 2rem; border: 1px solid var(--glass-border); border-radius: 8px; transition: 0.4s; text-align: center;}
+        .about-card:hover { transform: translateY(-10px); background: rgba(30, 30, 30, 0.8); }
+        .about-card i { color: var(--brand-gold); margin-bottom: 1.5rem; }
+
+        .process-flow { display: flex; justify-content: space-between; gap: 2rem; margin-top: 4rem; position: relative; }
+        .process-step { flex: 1; text-align: center; z-index: 1; }
+        .step-num { width: 50px; height: 50px; background: var(--gold-gradient); color: black; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; font-weight: 700; }
+
+        /* --- Portals --- */
         .portal-container {
             background: var(--bg-card); border: 1px solid var(--glass-border);
             border-radius: 8px; padding: 4rem; margin-bottom: 4rem;
@@ -90,7 +98,7 @@
         }
         .portal-container:hover .portal-image { filter: grayscale(0%) brightness(1); transform: scale(1.02); border-color: var(--brand-gold); }
 
-        /* --- Contact Page Design --- */
+        /* --- Contact --- */
         .contact-wrapper {
             display: grid; grid-template-columns: 1fr 1.5fr; gap: 4rem;
             background: rgba(10, 10, 10, 0.9); border: 1px solid var(--glass-border);
@@ -101,11 +109,6 @@
         .info-item { display: flex; align-items: flex-start; gap: 1.5rem; }
         .info-item i { color: var(--brand-gold); margin-top: 5px; }
         .info-item h4 { color: var(--brand-gold); margin-bottom: 5px; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; }
-        .info-item p { color: var(--text-main); font-size: 1rem; }
-
-        .social-links { display: flex; gap: 1.5rem; margin-top: 2rem; }
-        .social-links a { color: var(--text-muted); transition: 0.3s; }
-        .social-links a:hover { color: var(--brand-gold); transform: translateY(-3px); }
 
         .contact-form-panel { background: rgba(20, 20, 20, 0.5); padding: 3rem; border-radius: 8px; border: 1px solid #222; }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
@@ -115,22 +118,42 @@
             width: 100%; padding: 1rem; background: #000; border: 1px solid #333; color: white;
             border-radius: 4px; outline: none; transition: 0.3s;
         }
-        .form-group input:focus, .form-group textarea:focus { border-color: var(--brand-gold); box-shadow: 0 0 10px var(--gold-shadow); }
 
         /* --- Buttons --- */
         .btn-primary { background: var(--gold-gradient); color: #000; border: none; padding: 1rem 2.5rem; border-radius: 2px; font-weight: 700; cursor: pointer; transition: 0.4s; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: inline-block; }
-        .btn-primary:hover { transform: scale(1.05); filter: brightness(1.1); }
         .btn-outline { background: transparent; border: 1.5px solid var(--brand-gold); padding: 0.9rem 2.5rem; border-radius: 2px; color: var(--brand-gold); font-weight: 700; cursor: pointer; transition: 0.4s; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; display: inline-block; }
-        .btn-outline:hover { background: rgba(212, 175, 55, 0.1); }
         .btn-group { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; }
 
         /* --- Stats --- */
         .stats-glass { margin-top: 5rem; padding: 2.5rem 4rem; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(10px); border: 1px solid var(--glass-border); border-radius: 4px; display: flex; gap: 5rem; }
+        .stat-item div { display: flex; align-items: center; justify-content: center; gap: 2px; }
         .counter { font-size: 3.5rem; font-weight: 700; color: var(--brand-gold); }
+        .plus { font-size: 2.5rem; font-weight: 700; color: var(--brand-gold); }
+
+        /* --- Social Links Color Fix --- */
+.social-links { 
+    display: flex; 
+    gap: 1.5rem; 
+    margin-top: 2rem; 
+}
+
+.social-links a { 
+    /* This removes the default blue and sets it to your muted grey */
+    color: var(--text-muted); 
+    transition: 0.3s; 
+    text-decoration: none;
+}
+
+.social-links a:hover { 
+    /* This makes them turn Gold when you hover over them */
+    color: var(--brand-gold); 
+    transform: translateY(-3px); 
+}
 
         @media (max-width: 968px) {
-            .contact-wrapper, .portal-container, .form-row { grid-template-columns: 1fr; }
+            .contact-wrapper, .portal-container, .form-row, .mission-vision, .about-grid, .process-flow { grid-template-columns: 1fr; flex-direction: column; }
             .hero-title { font-size: 4rem; }
+            .stats-glass { flex-direction: column; gap: 2rem; padding: 2rem; }
         }
     </style>
 </head>
@@ -139,7 +162,7 @@
 
     <nav class="navbar">
         <div class="nav-container">
-            <div class="logo"><img src="logo.jpeg" alt="Logo" class="custom-logo"><span>HIREX</span></div>
+            <div class="logo"><img src="logo.jpeg" alt="Logo" class="custom-logo"><span>Hire X</span></div>
             <div class="nav-links">
                 <a href="#home">Home</a>
                 <a href="#about">About</a>
@@ -159,22 +182,67 @@
         </div>
         
         <div class="stats-glass">
-            <div class="stat-item"><div><h2 class="counter" data-target="500">0</h2></div><p>Placements</p></div>
-            <div class="stat-item"><div><h2 class="counter" data-target="150">0</h2></div><p>Partners</p></div>
-            <div class="stat-item"><div><h2 class="counter" data-target="50">0</h2></div><p>Max LPA</p></div>
+            <div class="stat-item">
+                <div><h2 class="counter" data-target="500">0</h2><span class="plus">+</span></div>
+                <p>Placements</p>
+            </div>
+            <div class="stat-item">
+                <div><h2 class="counter" data-target="150">0</h2><span class="plus">+</span></div>
+                <p>Partners</p>
+            </div>
+            <div class="stat-item">
+                <div><h2 class="counter" data-target="50">0</h2><span class="plus">+</span></div>
+                <p>Max LPA</p>
+            </div>
         </div>
     </section>
 
     <section id="about" class="section">
-        <div class="about-section">
-            <div class="about-header">
-                <h2>Elevating Careers</h2>
-                <p>HireX is a premium placement ecosystem bridging ambition and industry leadership.</p>
+        <div class="about-header">
+            <h2>The HireX Philosophy</h2>
+            <p>At HireX, we don't just facilitate jobs; we curate career trajectories. By combining sophisticated data analytics with elite industry connections, we create a seamless bridge between academic excellence and corporate leadership.</p>
+        </div>
+
+        <div class="mission-vision">
+            <div class="mission-box">
+                <h3>Our Mission</h3>
+                <p>To democratize access to elite opportunities by providing students with world-class preparation tools and direct lines to Fortune 500 recruiters.</p>
             </div>
-            <div class="about-grid">
-                <div class="about-card"><i data-lucide="shield-check" size="40"></i><h3>Verified Excellence</h3><p>Rigorous protocols for top talent.</p></div>
-                <div class="about-card"><i data-lucide="globe" size="40"></i><h3>Global Network</h3><p>Fortune 500 direct partnerships.</p></div>
-                <div class="about-card"><i data-lucide="trending-up" size="40"></i><h3>Data Driven</h3><p>Real-time analytics & tracking.</p></div>
+            <div class="mission-box">
+                <h3>Our Vision</h3>
+                <p>To become the global benchmark for institutional placement ecosystems, where every student's potential is recognized and matched with precision.</p>
+            </div>
+        </div>
+
+        <div class="about-grid">
+            <div class="about-card"><i data-lucide="shield-check" size="40"></i><h3>Verified Excellence</h3><p>Our multi-tier verification process ensures only the most qualified candidates reach final interview stages.</p></div>
+            <div class="about-card"><i data-lucide="globe" size="40"></i><h3>Global Network</h3><p>Partnerships spanning 15+ countries and 200+ industries, giving you a truly international career launchpad.</p></div>
+            <div class="about-card"><i data-lucide="trending-up" size="40"></i><h3>Data Analytics</h3><p>Real-time tracking of market trends and skill requirements to keep our curriculum and candidates ahead of the curve.</p></div>
+        </div>
+
+        <div class="about-header">
+            <h3>Our 4-Step Placement Excellence</h3>
+            <div class="process-flow">
+                <div class="process-step">
+                    <div class="step-num">01</div>
+                    <h4>Profiling</h4>
+                    <p>AI-driven skill assessment and profile building.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-num">02</div>
+                    <h4>Training</h4>
+                    <p>Bespoke prep modules for technical and soft skills.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-num">03</div>
+                    <h4>Matching</h4>
+                    <p>Precision algorithm connects talent with the right firm.</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-num">04</div>
+                    <h4>Placement</h4>
+                    <p>Final conversion and career onboarding support.</p>
+                </div>
             </div>
         </div>
     </section>
@@ -212,58 +280,26 @@
             <h2 style="font-family: 'Playfair Display'; font-size: 4rem; color: var(--brand-gold);">Get In Touch</h2>
             <p style="color: var(--text-muted); letter-spacing: 2px; text-transform: uppercase;">Excellence is just a message away</p>
         </div>
-
         <div class="contact-wrapper">
             <div class="contact-info-panel">
-                <div class="info-item">
-                    <i data-lucide="map-pin"></i>
-                    <div>
-                        <h4>Location</h4>
-                        <p>123 Corporate Tower, Financial District<br>Innovation City, 560001</p>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <i data-lucide="mail"></i>
-                    <div>
-                        <h4>Email Us</h4>
-                        <p>partnerships@hirex.edu<br>support@hirex.edu</p>
-                    </div>
-                </div>
-                <div class="info-item">
-                    <i data-lucide="phone"></i>
-                    <div>
-                        <h4>Call Us</h4>
-                        <p>+1 (234) GOLD-HIRE<br>Mon-Fri, 9am - 6pm</p>
-                    </div>
-                </div>
+                <div class="info-item"><i data-lucide="map-pin"></i><div><h4>Location</h4><p>R.M.D Engineering College,<br>Tiruvallur District,<br>Tamil Nadu <br>Pin code: 601 206.</p></div></div>
+                <div class="info-item"><i data-lucide="mail"></i><div><h4>Email Us</h4><p>rmdecp@gmail.com</p></div></div>
+                <div class="info-item"><i data-lucide="phone"></i><div><h4>Call Us</h4><p>+ 91-044-67919191</p></div></div>
                 <div class="social-links">
                     <a href="#"><i data-lucide="linkedin"></i></a>
                     <a href="#"><i data-lucide="twitter"></i></a>
                     <a href="#"><i data-lucide="instagram"></i></a>
                 </div>
             </div>
-
             <div class="contact-form-panel">
                 <form>
                     <div class="form-row">
-                        <div class="form-group">
-                            <label>Full Name</label>
-                            <input type="text" placeholder="John Doe">
-                        </div>
-                        <div class="form-group">
-                            <label>Professional Email</label>
-                            <input type="email" placeholder="john@company.com">
-                        </div>
+                        <div class="form-group"><label>Full Name</label><input type="text" placeholder="John Doe"></div>
+                        <div class="form-group"><label>Email</label><input type="email" placeholder="john@company.com"></div>
                     </div>
-                    <div class="form-group">
-                        <label>Subject</label>
-                        <input type="text" placeholder="Partnership Inquiry">
-                    </div>
-                    <div class="form-group">
-                        <label>Message</label>
-                        <textarea rows="5" placeholder="Tell us how we can help..."></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary" style="width: 100%;">Send Secure Message</button>
+                    <div class="form-group"><label>Subject</label><input type="text" placeholder="Partnership Inquiry"></div>
+                    <div class="form-group"><label>Message</label><textarea rows="5" placeholder="Tell us how we can help..."></textarea></div>
+                    <button type="submit" class="btn-primary" style="width: 100%;">Send Message</button>
                 </form>
             </div>
         </div>
