@@ -12,7 +12,7 @@
             --brand-gold: #D4AF37; 
             --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F1D37E 50%, #B8860B 100%);
             --bg-deep: #080808;
-            --bg-card: rgba(15, 15, 15, 0.85); /* Transparent for glass effect */
+            --bg-card: rgba(15, 15, 15, 0.85);
             --sidebar-navy: #050505;
             --text-main: #FFFFFF;
             --text-muted: #A0A0A0;
@@ -21,25 +21,21 @@
         }
 
         body { 
-            /* Added studback.png with a professional dark overlay */
             background: linear-gradient(rgba(8, 8, 8, 0.88), rgba(8, 8, 8, 0.95)), url('studback.png');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            
             font-family: 'Inter', sans-serif; 
             color: var(--text-main); 
             overflow-x: hidden; 
         }
         
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--brand-gold); border-radius: 10px; }
 
         .gold-text { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* Glass Panel Styling */
         .glass-panel {
             background: var(--bg-card) !important;
             backdrop-filter: blur(12px);
@@ -52,7 +48,6 @@
         }
         .animate-grid { opacity: 0; animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
 
-        /* Card Styling */
         .practice-card { 
             background: var(--bg-card) !important;
             backdrop-filter: blur(10px);
@@ -82,35 +77,14 @@
         }
         .btn-gold:hover { filter: brightness(1.2); transform: translateY(-2px); }
 
-        /* Performance Bars */
         .bar { width: 40px; background: var(--gold-gradient); border-radius: 6px 6px 0 0; transition: height 1.5s ease; height: 0; position: relative; }
-        .reading { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 900; color: var(--brand-gold); opacity: 0; }
+        .reading { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 900; color: var(--brand-gold); opacity: 0; transition: opacity 0.5s ease 1.2s; }
         
-        /* Modal & Setup */
-        #profile-setup { position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(15px); }
         .input-dark { background: rgba(0,0,0,0.6); border: 1px solid #333; color: white; border-radius: 12px; }
         .input-dark:focus { border-color: var(--brand-gold); outline: none; }
     </style>
 </head>
 <body class="flex">
-
-    <div id="profile-setup">
-        <div class="glass-panel p-10 rounded-[30px] shadow-2xl w-[450px] animate-grid">
-            <div class="mb-8 text-center">
-                <div class="w-16 h-16 bg-[#1a1a1a] text-gold rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[var(--glass-border)]">
-                    <i data-lucide="user-plus" class="text-[#D4AF37]" size="32"></i>
-                </div>
-                <h2 class="text-2xl font-black mb-1 gold-text">Initialize Profile</h2>
-                <p class="text-gray-500 text-sm">Welcome to the Elite Ecosystem</p>
-            </div>
-            <div class="space-y-4">
-                <input type="text" id="setup-name" placeholder="Full Name" class="w-full p-4 input-dark">
-                <input type="text" id="setup-dept" placeholder="Department (e.g., IT)" class="w-full p-4 input-dark">
-                <input type="text" id="setup-reg" placeholder="Registration No" class="w-full p-4 input-dark">
-                <button onclick="saveProfile()" class="w-full py-4 btn-gold text-lg shadow-lg">Enter Dashboard</button>
-            </div>
-        </div>
-    </div>
 
     <aside class="w-72 h-screen bg-[#050505] flex flex-col fixed left-0 top-0 z-50 border-r border-[#1a1a1a]">
         <div class="p-8">
@@ -135,15 +109,12 @@
         <header class="h-20 bg-black/40 backdrop-blur-md border-b border-[#1a1a1a] flex items-center justify-between px-10 sticky top-0 z-40">
             <h2 class="text-xl font-black gold-text">Student Dashboard</h2>
             <div class="flex items-center gap-6">
-                <button onclick="editProfile()" class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#D4AF37] bg-[rgba(212,175,55,0.1)] px-4 py-2 rounded-lg border border-[var(--glass-border)] hover:bg-[#D4AF37] hover:text-black transition-all">
-                    <i data-lucide="user-cog" size="14"></i> Edit Profile
-                </button>
                 <div class="flex items-center gap-4 text-right border-l pl-6 border-[#1a1a1a]">
                     <div>
-                        <p id="nav-name" class="font-black text-xs text-white tracking-tight">Student Name</p>
-                        <p id="nav-reg" class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">REG NO</p>
+                        <p id="nav-name" class="font-black text-xs text-white tracking-tight">Alex Sterling</p>
+                        <p id="nav-reg" class="text-[9px] text-gray-500 font-bold uppercase tracking-widest">2024HX001</p>
                     </div>
-                    <div class="w-11 h-11 rounded-lg bg-[#D4AF37] text-black flex items-center justify-center font-black" id="avatar-initial">S</div>
+                    <div class="w-11 h-11 rounded-lg bg-[#D4AF37] text-black flex items-center justify-center font-black" id="avatar-initial">A</div>
                 </div>
             </div>
         </header>
@@ -151,16 +122,16 @@
         <div class="p-8 space-y-8">
             <div class="glass-panel rounded-[24px] p-10 animate-grid flex justify-between items-center group overflow-hidden">
                 <div class="relative z-10">
-                    <h3 class="text-3xl font-black mb-1">Welcome, <span id="welcome-name" class="gold-text">Student</span>!</h3>
+                    <h3 class="text-3xl font-black mb-1">Welcome, <span id="welcome-name" class="gold-text">Alex</span>!</h3>
                     <p class="text-gray-400 text-sm font-medium">Ready to claim your elite placement today?</p>
                 </div>
                 <i data-lucide="award" size="80" class="text-[#D4AF37]/10 group-hover:text-[#D4AF37]/20 transition-all duration-500"></i>
             </div>
 
             <div class="grid grid-cols-3 gap-8 animate-grid" style="animation-delay: 0.1s;">
-                <div class="glass-panel p-8 rounded-[24px]"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Full Name</p><h4 id="display-name" class="font-black text-xl text-white">Name</h4></div>
-                <div class="glass-panel p-8 rounded-[24px]"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Branch</p><h4 id="display-dept" class="font-black text-xl text-white">Dept</h4></div>
-                <div class="glass-panel p-8 rounded-[24px]"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Reg No</p><h4 id="display-reg" class="font-black text-xl text-white">REG NO</h4></div>
+                <div class="glass-panel p-8 rounded-[24px]"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Full Name</p><h4 id="display-name" class="font-black text-xl text-white">Alex Sterling</h4></div>
+                <div class="glass-panel p-8 rounded-[24px]"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Branch</p><h4 id="display-dept" class="font-black text-xl text-white">Computer Science</h4></div>
+                <div class="glass-panel p-8 rounded-[24px]"><p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Reg No</p><h4 id="display-reg" class="font-black text-xl text-white">2024HX001</h4></div>
             </div>
 
             <div class="grid grid-cols-3 gap-8">
@@ -204,40 +175,21 @@
     <script>
         lucide.createIcons();
 
-        function saveProfile() {
-            const name = document.getElementById('setup-name').value;
-            const dept = document.getElementById('setup-dept').value;
-            const reg = document.getElementById('setup-reg').value;
-            if(!name || !dept || !reg) return alert("All fields are mandatory for elite access!");
-            
-            document.getElementById('welcome-name').innerText = name.split(' ')[0];
-            document.getElementById('display-name').innerText = name;
-            document.getElementById('display-dept').innerText = dept;
-            document.getElementById('display-reg').innerText = reg;
-            document.getElementById('nav-name').innerText = name;
-            document.getElementById('nav-reg').innerText = reg;
-            document.getElementById('avatar-initial').innerText = name.charAt(0).toUpperCase();
-            
-            document.getElementById('profile-setup').style.opacity = '0';
+        // Animate stats bars on page load
+        window.onload = () => {
             setTimeout(() => {
-                document.getElementById('profile-setup').style.display = 'none';
                 document.querySelectorAll('.bar').forEach(bar => {
                     bar.style.height = bar.getAttribute('data-h');
                     bar.querySelector('.reading').style.opacity = '1';
                 });
-            }, 300);
-        }
+            }, 800);
+        };
 
         function handleCardClick(element) {
             const title = element.querySelector('h5').innerText.toLowerCase();
             if (title.includes('aptitude')) window.location.href = 'apti.html';
             else if (title.includes('programming')) window.location.href = 'prog.html';
             else if (title.includes('mock')) window.location.href = 'mock.html';
-        }
-
-        function editProfile() {
-            document.getElementById('profile-setup').style.display = 'flex';
-            document.getElementById('profile-setup').style.opacity = '1';
         }
 
         function addNewTodo() {

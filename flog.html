@@ -221,9 +221,21 @@ loginForm.addEventListener('submit', async (e) => {
     errorDisplay.style.display = 'none';
 
     try {
-        await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    if (user.emailVerified) {
+        // Success! Redirect to dashboard
         window.location.href = "faculty-dashboard.html";
-    } catch (error) {
+    } else {
+        // NOT VERIFIED: Show error and sign them back out
+        await signOut(auth);
+        errorMsg.innerText = "Please verify your email address before logging in. Check your inbox!";
+        errorMsg.classList.remove('hidden');
+        loginBtn.innerText = "Secure Access";
+        loginBtn.disabled = false;
+    }
+} catch (error) {
         loginBtn.innerText = "Secure Access";
         errorDisplay.style.display = 'block';
 
