@@ -8,6 +8,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
+        /* --- SAME UI (UNCHANGED) --- */
         :root {
             --brand-gold: #D4AF37; 
             --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F1D37E 50%, #B8860B 100%);
@@ -152,48 +153,49 @@
 
 <body>
 
-    <div class="top-nav">
-        <a href="home.html" class="btn-back">
-            <i data-lucide="arrow-left" size="16"></i> Back
-        </a>
+<div class="top-nav">
+    <a href="home.html" class="btn-back">
+        <i data-lucide="arrow-left" size="16"></i> Back
+    </a>
+</div>
+
+<div class="login-card">
+    <div class="icon-container">
+        <i data-lucide="shield-check" size="32"></i>
     </div>
 
-    <div class="login-card">
-        <div class="icon-container">
-            <i data-lucide="shield-check" size="32"></i>
+    <h1>Faculty Login</h1>
+    <p class="subtitle">Access your academic dashboard.</p>
+
+    <p id="error-message"></p>
+
+    <form id="loginForm">
+        <div class="form-group">
+            <label for="email">Institutional Email</label>
+            <input type="email" id="email" required>
         </div>
 
-        <h1>Faculty Login</h1>
-        <p class="subtitle">Access your academic dashboard.</p>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" required>
+        </div>
 
-        <p id="error-message"></p>
+        <button type="submit" class="btn-sign-in" id="loginBtn">Secure Access</button>
+    </form>
 
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="email">Institutional Email</label>
-                <input type="email" id="email" placeholder="faculty@hirex.edu" required>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="••••••••" required>
-            </div>
-
-            <button type="submit" class="btn-sign-in" id="loginBtn">Secure Access</button>
-        </form>
-
-        <a href="forget-password.html" class="forget-link">Forgot your credentials?</a>
-        <p class="text-xs text-gray-500 mt-4">
-            New here? 
-            <a href="fsignup.html" style="color: var(--brand-gold); text-decoration: none;">
-                Create Faculty Account
-            </a>
-        </p>
-    </div>
+    <a href="forget-password.html" class="forget-link">Forgot your credentials?</a>
+    <p class="text-xs text-gray-500 mt-4">
+        New here? 
+        <a href="fsignup.html" style="color: var(--brand-gold); text-decoration: none;">
+            Create Faculty Account
+        </a>
+    </p>
+</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk",
@@ -206,6 +208,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 const loginForm = document.getElementById('loginForm');
 const errorDisplay = document.getElementById('error-message');
@@ -218,36 +221,51 @@ loginForm.addEventListener('submit', async (e) => {
     const password = document.getElementById('password').value.trim();
 
     loginBtn.innerText = "Verifying...";
-    errorDisplay.style.display = 'none';
+    loginBtn.disabled = true;
+    errorDisplay.style.display = "none";
 
     try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-    if (user.emailVerified) {
-        // Success! Redirect to dashboard
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+
+        if (!userDoc.exists()) {
+            await signOut(auth);
+            return showError("User profile not found.");
+        }
+
+        const userData = userDoc.data();
+
+        if (userData.role !== "faculty") {
+            await signOut(auth);
+            return showError("Access Denied: Faculty portal only.");
+        }
+
+        if (!user.emailVerified) {
+            await signOut(auth);
+            return showError("Please verify your email before logging in.");
+        }
+
         window.location.href = "faculty-dashboard.html";
-    } else {
-        // NOT VERIFIED: Show error and sign them back out
-        await signOut(auth);
-        errorMsg.innerText = "Please verify your email address before logging in. Check your inbox!";
-        errorMsg.classList.remove('hidden');
-        loginBtn.innerText = "Secure Access";
-        loginBtn.disabled = false;
-    }
-} catch (error) {
-        loginBtn.innerText = "Secure Access";
-        errorDisplay.style.display = 'block';
 
-        if (error.code === 'auth/invalid-credential') {
-            errorDisplay.innerText = "Invalid email or password.";
-        } else if (error.code === 'auth/user-not-found') {
-            errorDisplay.innerText = "Account not found.";
+    } catch (error) {
+        if (error.code === "auth/invalid-credential") {
+            showError("Invalid email or password.");
+        } else if (error.code === "auth/too-many-requests") {
+            showError("Too many attempts. Try again later.");
         } else {
-            errorDisplay.innerText = "Login failed. Please try again.";
+            showError("Login failed. Please try again.");
         }
     }
 });
+
+function showError(message) {
+    errorDisplay.innerText = message;
+    errorDisplay.style.display = "block";
+    loginBtn.innerText = "Secure Access";
+    loginBtn.disabled = false;
+}
 
 lucide.createIcons();
 </script>
