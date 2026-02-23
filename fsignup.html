@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireX | Faculty Verify & Join</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --brand-gold: #D4AF37; 
+            --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F1D37E 50%, #B8860B 100%);
+            --bg-deep: #080808;
+            --bg-card: rgba(15, 15, 15, 0.85);
+            --text-main: #FFFFFF;
+            --glass-border: rgba(212, 175, 55, 0.2);
+        }
+
+        body { 
+            background: linear-gradient(rgba(8, 8, 8, 0.85), rgba(8, 8, 8, 0.95)), url('studback.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            font-family: 'Inter', sans-serif; 
+            color: var(--text-main); 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .signup-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border-radius: 24px;
+        }
+
+        .gold-text { 
+            background: var(--gold-gradient); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+        }
+
+        .input-field { 
+            background: rgba(0, 0, 0, 0.5); 
+            border: 1px solid #333; 
+            color: white; 
+        }
+
+        .input-field:focus { 
+            border-color: var(--brand-gold); 
+            outline: none; 
+        }
+
+        .btn-gold { 
+            background: var(--gold-gradient); 
+            color: black; 
+            font-weight: 800; 
+            transition: 0.3s; 
+        }
+
+        .btn-gold:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+        }
+
+        #verify-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Verification Modal -->
+    <div id="verify-modal">
+        <div class="p-8 rounded-full bg-[#D4AF37]/10 mb-6">
+            <i data-lucide="mail-check" class="text-[#D4AF37]" size="64"></i>
+        </div>
+
+        <h2 class="text-3xl font-black gold-text mb-4">Check Your Inbox</h2>
+        <p class="text-gray-400 max-w-sm mb-8">
+            We've sent a verification link to your email. 
+            Please verify your Faculty account to unlock the Dashboard.
+        </p>
+
+        <button onclick="window.location.href='flog.html'" 
+            class="px-8 py-3 btn-gold rounded-lg">
+            Proceed to Login
+        </button>
+    </div>
+
+    <!-- Signup Card -->
+    <div class="signup-card text-center">
+
+        <div class="inline-block p-4 rounded-full bg-black/50 border border-[var(--glass-border)] mb-6 text-[#D4AF37]">
+            <i data-lucide="graduation-cap" size="32"></i>
+        </div>
+        
+        <h1 class="text-3xl font-black mb-2 gold-text">Faculty Signup</h1>
+        <p class="text-gray-400 text-sm mb-8">
+            Join as an Academic Authority.
+        </p>
+
+        <form id="signupForm" class="text-left space-y-5">
+            <div>
+                <label class="block text-[10px] font-bold text-[#D4AF37] uppercase tracking-widest mb-2">
+                    Institutional Email
+                </label>
+                <input type="email" id="email" required 
+                    placeholder="name@college.edu"
+                    class="w-full p-4 rounded-xl input-field">
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-[#D4AF37] uppercase tracking-widest mb-2">
+                    Password
+                </label>
+                <input type="password" id="password" required 
+                    placeholder="••••••••"
+                    class="w-full p-4 rounded-xl input-field">
+            </div>
+
+            <p id="error-message" class="text-red-500 text-xs hidden"></p>
+
+            <button type="submit" id="signupBtn"
+                class="w-full py-4 mt-4 btn-gold rounded-xl shadow-lg uppercase tracking-widest font-black">
+                Register & Verify
+            </button>
+        </form>
+
+        <div class="mt-8 text-sm text-gray-500">
+            Already registered?
+            <a href="flog.html" class="text-[#D4AF37] font-bold hover:underline">
+                Sign In
+            </a>
+        </div>
+    </div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, setDoc } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const signupForm = document.getElementById('signupForm');
+const errorMsg = document.getElementById('error-message');
+const signupBtn = document.getElementById('signupBtn');
+const modal = document.getElementById('verify-modal');
+
+signupForm.addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    signupBtn.disabled = true;
+    signupBtn.innerText = "Processing...";
+
+    try {
+
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await sendEmailVerification(userCredential.user);
+
+        // 🔥 Store faculty role in Firestore
+        await setDoc(doc(db, "users", userCredential.user.uid), {
+            email: email,
+            role: "faculty",
+            createdAt: new Date()
+        });
+
+        modal.style.display = 'flex';
+
+    } catch (error) {
+        signupBtn.disabled = false;
+        signupBtn.innerText = "Register & Verify";
+        errorMsg.innerText = error.message;
+        errorMsg.classList.remove('hidden');
+    }
+});
+
+lucide.createIcons();
+
+</script>
+
+</body>
+</html>
