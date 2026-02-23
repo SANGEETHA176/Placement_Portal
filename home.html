@@ -1,37 +1,181 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HireX | Professional Placement Portal</title>
-    <link rel="stylesheet" href="home.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+    <title>HireX | Black & Gold Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            /* Black & Gold Luxury Palette */
+            --brand-gold: #D4AF37; 
+            --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F1D37E 50%, #B8860B 100%);
+            --bg-deep: #080808;
+            --bg-card: #121212;
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --glass-bg: rgba(18, 18, 18, 0.8);
+            --glass-border: rgba(212, 175, 55, 0.2);
+            --gold-shadow: rgba(212, 175, 55, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* Animated Luxury Background */
+        .gradient-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: radial-gradient(circle at 15% 15%, rgba(212, 175, 55, 0.05) 0%, transparent 40%),
+                        radial-gradient(circle at 85% 85%, rgba(184, 134, 11, 0.05) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        /* --- Navbar --- */
+        .navbar {
+            position: fixed; width: 100%; top: 0; z-index: 1000;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .nav-container {
+            max-width: 1200px; margin: 0 auto; padding: 0.8rem 2rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .logo { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.6rem; letter-spacing: 1px; }
+        
+        /* Custom Logo Styling */
+        .custom-logo {
+            height: 45px; /* Adjust height based on your logo shape */
+            width: auto;
+            border-radius: 4px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .logo span { background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .nav-links a {
+            text-decoration: none; color: var(--text-main); font-size: 0.9rem;
+            margin-left: 2.5rem; font-weight: 500; opacity: 0.7; transition: 0.3s;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .nav-links a:hover { opacity: 1; color: var(--brand-gold); text-shadow: 0 0 10px var(--gold-shadow); }
+
+        /* --- Hero Section --- */
+        .section { min-height: 100vh; padding: 140px 2rem 80px; max-width: 1200px; margin: 0 auto; }
+        .hero { text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        .hero-title { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 7rem; 
+            background: var(--gold-gradient); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+        }
+
+        .hero-subtitle { 
+            font-size: 1.1rem; color: var(--text-muted); 
+            margin-bottom: 3.5rem; letter-spacing: 4px; text-transform: uppercase; 
+        }
+
+        .btn-primary {
+            background: var(--gold-gradient); color: #000; border: none;
+            padding: 1.1rem 3rem; border-radius: 4px; font-weight: 700;
+            cursor: pointer; box-shadow: 0 10px 30px var(--gold-shadow);
+            transition: 0.4s; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(212, 175, 55, 0.3); }
+
+        .btn-outline {
+            background: transparent; border: 1.5px solid var(--brand-gold);
+            padding: 1rem 3rem; border-radius: 4px; color: var(--brand-gold);
+            font-weight: 700; cursor: pointer; margin-left: 1.5rem;
+            transition: 0.4s; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .btn-outline:hover { background: rgba(212, 175, 55, 0.1); }
+
+        /* --- Glass Stats --- */
+        .stats-glass {
+            margin-top: 6rem; padding: 3rem 5rem;
+            background: rgba(15, 15, 15, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex; gap: 6rem;
+        }
+
+        .stat-row { display: flex; align-items: baseline; gap: 4px; color: var(--brand-gold); }
+        .counter { font-size: 4rem; font-weight: 800; }
+        .plus { font-size: 2.5rem; font-weight: 700; }
+        .stat-item p { text-transform: uppercase; font-size: 0.7rem; font-weight: 600; letter-spacing: 2px; color: var(--text-muted); }
+
+        /* --- Sections & Cards --- */
+        .section-title { font-size: 3rem; font-weight: 700; margin-bottom: 4rem; text-align: center; color: var(--text-main); }
+        .about-grid, .login-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+
+        .about-card, .login-card {
+            background: var(--bg-card); padding: 3rem 2rem; border-radius: 8px;
+            border: 1px solid #222; transition: 0.4s; position: relative; overflow: hidden;
+        }
+
+        .about-card:hover { border-color: var(--brand-gold); transform: translateY(-10px); }
+        .about-card h3 { margin: 1.5rem 0 1rem; color: var(--brand-gold); }
+        .about-card p { color: var(--text-muted); line-height: 1.6; }
+        .brand-icon { color: var(--brand-gold) !important; }
+
+        .login-card { padding: 0; }
+        .card-img { height: 180px; background-size: cover; background-position: center; filter: grayscale(100%) brightness(0.7); transition: 0.5s; }
+        .login-card:hover .card-img { filter: grayscale(0%) brightness(1); }
+        .card-content { padding: 2rem; }
+        .card-content h3 { color: var(--brand-gold); margin-bottom: 0.5rem; }
+
+        /* --- Contact --- */
+        .contact-container {
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 4rem; padding: 4rem;
+            background: rgba(18, 18, 18, 0.9); border: 1px solid var(--glass-border); border-radius: 12px;
+        }
+        .contact-form { background: #000; padding: 3rem; border-radius: 8px; border: 1px solid #222; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; font-size: 0.8rem; color: var(--brand-gold); margin-bottom: 0.5rem; text-transform: uppercase; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 1rem; border-radius: 4px; border: 1px solid #333;
+            background: #111; color: #fff; outline: none; transition: 0.3s;
+        }
+        .form-group input:focus { border-color: var(--brand-gold); }
+
+        @media (max-width: 968px) {
+            .about-grid, .login-grid, .stats-glass { grid-template-columns: 1fr; flex-direction: column; gap: 2rem; }
+            .hero-title { font-size: 4rem; }
+            .contact-container { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
     <div class="gradient-bg"></div>
 
-    <div class="corner-theme-switcher">
-        <button id="theme-btn" class="icon-btn" aria-label="Toggle Theme">
-            <i data-lucide="sun" id="current-theme-icon"></i>
-        </button>
-        <div id="theme-dropdown" class="dropdown">
-            <button onclick="setTheme('light')"><i data-lucide="sun"></i> Light</button>
-            <button onclick="setTheme('dark')"><i data-lucide="moon"></i> Dark</button>
-            <button onclick="setTheme('system')"><i data-lucide="monitor"></i> System</button>
-        </div>
-    </div>
-
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <i data-lucide="graduation-cap" class="brand-icon"></i>
-                <span>HireX</span>
+                <img src="logo.jpeg" alt="HireX Logo" class="custom-logo">
+                <span>HIREX</span>
             </div>
             <div class="nav-links">
                 <a href="#home">Home</a>
                 <a href="#about">About</a>
-                <a href="#login">Login</a>
+                <a href="#login">Dashboards</a>
                 <a href="#contact">Contact</a>
             </div>
         </div>
@@ -39,100 +183,146 @@
 
     <section id="home" class="section hero">
         <h1 class="hero-title">HireX</h1>
-        <p class="hero-subtitle">Connecting Talent with Opportunity</p>
+        <p class="hero-subtitle">Elite Talent • Premium Placement</p>
         <div class="hero-btns">
-            <button class="btn-primary" onclick="scrollToSection('about')">Get Placed Smarter</button>
-            <button class="btn-outline" onclick="scrollToSection('login')">Explore Opportunities</button>
+            <button class="btn-primary" onclick="scrollToSection('about')">Begin Excellence</button>
+            <button class="btn-outline" onclick="scrollToSection('login')">View Drives</button>
         </div>
+        
         <div class="stats-glass">
             <div class="stat-item">
                 <div class="stat-row"><h2 class="counter" data-target="500">0</h2><span class="plus">+</span></div>
-                <p>Students Placed</p>
+                <p>Global Placements</p>
             </div>
             <div class="stat-item">
                 <div class="stat-row"><h2 class="counter" data-target="150">0</h2><span class="plus">+</span></div>
-                <p>Companies Visited</p>
+                <p>Partnered Giants</p>
             </div>
             <div class="stat-item">
-                <div class="stat-row"><h2 class="counter" data-target="50">0</h2><span class="plus">+LPA</span></div>
-                <p>Highest Package</p>
+                <div class="stat-row"><h2 class="counter" data-target="50">0</h2><span class="plus">LPA</span></div>
+                <p>Peak Package</p>
             </div>
         </div>
     </section>
 
     <section id="about" class="section about">
-        <h2 class="section-title">A New Era of Placement Preparation</h2>
+        <h2 class="section-title">Institutional Excellence</h2>
         <div class="about-grid">
             <div class="about-card">
-                <i data-lucide="graduation-cap" class="brand-icon"></i>
+                <i data-lucide="shield-check" class="brand-icon"></i>
                 <h3>For Students</h3>
-                <p>Structured aptitude and technical preparation, practice tests, and mock interviews with real-time feedback.</p>
+                <p>Master technical assessments and high-stakes mock interviews with our golden-standard preparation kit.</p>
             </div>
             <div class="about-card">
-                <i data-lucide="user" class="brand-icon"></i>
+                <i data-lucide="award" class="brand-icon"></i>
                 <h3>For Faculty</h3>
-                <p>Upload materials, conduct tests, and monitor student progress via a centralized dashboard.</p>
+                <p>High-precision analytics to track progress and refine student readiness for top-tier recruitment.</p>
             </div>
             <div class="about-card">
-                <i data-lucide="briefcase" class="brand-icon"></i>
-                <h3>For Placement Cell</h3>
-                <p>Manage drives, track readiness, and generate insightful analytics for the institution.</p>
+                <i data-lucide="gem" class="brand-icon"></i>
+                <h3>For Corporate</h3>
+                <p>Direct access to the top 1% of campus talent, curated through rigorous internal evaluations.</p>
             </div>
         </div>
     </section>
 
     <section id="login" class="section login">
-        <h2 class="section-title">Login to Your Dashboard</h2>
+        <h2 class="section-title">Secure Portals</h2>
         <div class="login-grid">
             <div class="login-card">
-                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=400')"></div>
+                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=400')"></div>
                 <div class="card-content">
-                    <h3>Student Login</h3>
-                    <p>Access your training modules and tests.</p>
-                    <a href="slog.html">
-                    <button class="btn-primary">Login Now</button>
-                </a>
+                    <h3>Student</h3>
+                    <p>Enter your training suite.</p>
+                    <button class="btn-primary" style="width:100%;" onclick="location.href='slog.html'">Enter</button>
                 </div>
             </div>
             <div class="login-card">
-                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1544531585-9847b68c8c86?auto=format&fit=crop&q=80&w=400')"></div>
+                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1454165833767-027ffea9e77b?q=80&w=400')"></div>
                 <div class="card-content">
-                    <h3>Faculty Login</h3>
-                    <p>Manage student records and evaluations.</p>
-                    <a href="flog.html">
-                    <button class="btn-primary">Login Now</button>
-                </a>
+                    <h3>Faculty</h3>
+                    <p>Manage performance metrics.</p>
+                    <button class="btn-primary" style="width:100%;" onclick="location.href='flog.html'">Enter</button>
                 </div>
             </div>
             <div class="login-card">
-                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=400')"></div>
+                <div class="card-img" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=400')"></div>
                 <div class="card-content">
-                    <h3>Admin Login</h3>
-                    <p>Oversee overall placement activity.</p>
-                    <a href="alog.html">
-                    <button class="btn-primary">Login Now</button>
-                </a>
+                    <h3>Admin</h3>
+                    <p>System-wide command center.</p>
+                    <button class="btn-primary" style="width:100%;" onclick="location.href='alog.html'">Enter</button>
                 </div>
             </div>
         </div>
     </section>
 
     <section id="contact" class="section contact">
-        <div class="contact-container glass">
+        <div class="contact-container">
             <div class="contact-info">
-                <h2>Contact the Placement Cell</h2>
-                <div class="info-item"><i data-lucide="mail" class="brand-icon"></i><p>placement@hirex.edu</p></div>
-                <div class="info-item"><i data-lucide="phone" class="brand-icon"></i><p>+1 (234) 567-890</p></div>
+                <h2 style="font-size: 2.5rem; margin-bottom: 2rem;">Get In Touch</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">Reach out to the Placement Cell for partnership inquiries or technical support.</p>
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 1rem;">
+                    <i data-lucide="mail" class="brand-icon"></i> <span>office@hirex.vip</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <i data-lucide="globe" class="brand-icon"></i> <span>www.hirex-excellence.com</span>
+                </div>
             </div>
             <div class="contact-form">
-                <div class="form-group"><label>Name</label><input type="text" placeholder="Full Name"></div>
-                <div class="form-group"><label>Email</label><input type="email" placeholder="Email Address"></div>
-                <div class="form-group"><label>Message</label><textarea rows="4" placeholder="How can we help?"></textarea></div>
-                <button class="btn-primary full-width">Submit Message</button>
+                <div class="form-group"><label>Identity</label><input type="text" placeholder="Your Name"></div>
+                <div class="form-group"><label>Email</label><input type="email" placeholder="professional@email.com"></div>
+                <div class="form-group"><label>Inquiry</label><textarea rows="4" placeholder="Message..."></textarea></div>
+                <button class="btn-primary" style="width:100%;">Send Inquiry</button>
             </div>
         </div>
     </section>
 
-    <script src="home.js"></script>
+    <script>
+        lucide.createIcons();
+
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        const animateStats = () => {
+            const counters = document.querySelectorAll('.counter');
+            const speed = 2500; 
+
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                let startTime = null;
+
+                const update = (timestamp) => {
+                    if (!startTime) startTime = timestamp;
+                    const progress = Math.min((timestamp - startTime) / speed, 1);
+                    const easedProgress = 1 - Math.pow(1 - progress, 4); 
+                    counter.innerText = Math.floor(easedProgress * target);
+
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    } else {
+                        counter.innerText = target;
+                    }
+                };
+                requestAnimationFrame(update);
+            });
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateStats();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            observer.observe(document.querySelector('.stats-glass'));
+        });
+    </script>
 </body>
 </html>
