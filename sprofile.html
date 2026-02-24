@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HireX | Student Profile</title>
+    <title>HireX | Complete Your Profile</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -20,29 +20,60 @@
         * { box-sizing: border-box; margin: 0; padding: 0; scroll-behavior: smooth; }
         body { background-color: var(--bg-black); color: white; font-family: 'Inter', sans-serif; padding-bottom: 50px; }
 
+        /* Navigation */
         nav {
-            height: 80px; display: flex; justify-content: center; align-items: center;
-            padding: 0 5%; border-bottom: 1px solid var(--border-color);
-            background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100;
+            height: 80px;
+            display: flex;
+            justify-content: center; /* Centered Logo for clean look */
+            align-items: center;
+            padding: 0 5%;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 100;
         }
         .logo-img { height: 50px; cursor: pointer; }
 
-        .photo-upload-section { text-align: center; margin-bottom: 30px; }
+        /* Photo Upload Styling */
+        .photo-upload-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
         .profile-preview {
-            width: 120px; height: 120px; border-radius: 50%; border: 2px dashed var(--brand-gold);
-            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;
-            overflow: hidden; background: #111; position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 2px dashed var(--brand-gold);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #111;
+            position: relative;
         }
         .profile-preview img { width: 100%; height: 100%; object-fit: cover; }
-        .photo-btn { font-size: 0.75rem; color: var(--brand-gold); cursor: pointer; text-decoration: underline; }
+        .photo-btn {
+            font-size: 0.75rem;
+            color: var(--brand-gold);
+            cursor: pointer;
+            text-decoration: underline;
+        }
 
+        /* Layout & Cards */
         .header-container { max-width: 900px; margin: 40px auto 20px; text-align: center; }
         h1 { font-family: 'Poppins'; font-size: 2rem; margin-bottom: 10px; }
         .progress-wrapper { background: #111; height: 8px; border-radius: 10px; margin: 20px 0; overflow: hidden; }
         .progress-bar { height: 100%; background: var(--gold-gradient); width: 10%; transition: 0.5s ease; }
 
         .form-container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
-        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; padding: 40px; margin-bottom: 30px; }
+        .card { 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-color); 
+            border-radius: 20px; 
+            padding: 40px; 
+            margin-bottom: 30px; 
+        }
         
         h2 { font-family: 'Poppins'; font-size: 1.25rem; color: var(--brand-gold); margin-bottom: 25px; display: flex; align-items: center; gap: 12px; }
         .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
@@ -64,24 +95,27 @@
             width: 100%; padding: 18px; background: var(--gold-gradient); color: #000; border: none; 
             border-radius: 12px; font-weight: 700; text-transform: uppercase; cursor: pointer;
         }
-        .btn-cancel { display: block; text-align: center; margin-top: 15px; color: var(--text-dim); text-decoration: none; font-size: 0.8rem; }
 
         #fileInput { display: none; }
     </style>
 </head>
 <body>
 
-<nav><img src="logo.jpeg" alt="HireX Logo" class="logo-img"></nav>
+<nav>
+    <img src="logo.jpeg" alt="HireX Logo" class="logo-img">
+</nav>
 
 <div class="header-container">
-    <h1 id="pageTitle">Complete Your Profile</h1>
-    <p id="pageSubtitle" style="color: var(--text-dim);">One-time profile setup for the HireX Placement Portal.</p>
-    <div class="progress-wrapper" id="progressWrapper"><div class="progress-bar" id="progressBar"></div></div>
+    <h1>Create Your Professional Identity</h1>
+    <p style="color: var(--text-dim);">One-time profile setup for the HireX Placement Portal.</p>
+    <div class="progress-wrapper"><div class="progress-bar" id="progressBar"></div></div>
 </div>
 
 <div class="form-container">
     <div class="photo-upload-section">
-        <div class="profile-preview" id="photoPreview"><i data-lucide="user" size="40" style="color: #333;"></i></div>
+        <div class="profile-preview" id="photoPreview">
+            <i data-lucide="user" size="40" style="color: #333;"></i>
+        </div>
         <label for="fileInput" class="photo-btn">Upload Profile Photo</label>
         <input type="file" id="fileInput" accept="image/*">
     </div>
@@ -117,7 +151,6 @@
         </div>
 
         <button type="submit" class="btn-gold" id="saveBtn">Finalize & Go to Dashboard</button>
-        <a href="sdashboard.html" class="btn-cancel" id="cancelBtn" style="display:none;">Cancel Changes</a>
     </form>
 </div>
 
@@ -126,74 +159,78 @@
     import { getFirestore, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", authDomain: "hirex-73d04.firebaseapp.com", projectId: "hirex-73d04", storageBucket: "hirex-73d04.firebasestorage.app", messagingSenderId: "435154197357", appId: "1:435154197357:web:5dbce3288c6a2771685864" };
+    const firebaseConfig = {
+        apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk",
+        authDomain: "hirex-73d04.firebaseapp.com",
+        projectId: "hirex-73d04",
+        storageBucket: "hirex-73d04.firebasestorage.app",
+        messagingSenderId: "435154197357",
+        appId: "1:435154197357:web:5dbce3288c6a2771685864"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    let skills = [];
-
+    // --- SECURITY LOGIC: AUTO-REDIRECT IF ALREADY COMPLETE ---
     onAuthStateChanged(auth, async (user) => {
-        if (!user) { window.location.href = "slog.html"; return; }
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const isEditMode = urlParams.get('mode') === 'edit';
-
-        const docRef = doc(db, "users", user.uid);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            const data = docSnap.data();
-
-            // Auto-fill existing data
-            if (data.name) document.getElementById('fullName').value = data.name;
-            if (data.regNo) document.getElementById('regNo').value = data.regNo;
-            if (data.dept) document.getElementById('dept').value = data.dept;
-            if (data.degree) document.getElementById('degree').value = data.degree;
-            if (data.gradYear) document.getElementById('gradYear').value = data.gradYear;
-            if (data.cgpa) document.getElementById('cgpa').value = data.cgpa;
-            if (data.summary) document.getElementById('summary').value = data.summary;
-            if (data.skills) { skills = data.skills; renderSkills(); }
-
-            // If not in edit mode and already complete, redirect away
-            if (!isEditMode && data.profileComplete === true) {
+        if (user) {
+            const docRef = doc(db, "users", user.uid);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists() && docSnap.data().profileComplete === true) {
+                // User already has a profile, don't let them stay here
                 window.location.href = "sdashboard.html";
-                return;
             }
-
-            // UI adjustments for Edit Mode
-            if (isEditMode) {
-                document.getElementById('pageTitle').innerText = "Update Your Profile";
-                document.getElementById('pageSubtitle').innerText = "Modify your professional identity details.";
-                document.getElementById('saveBtn').innerText = "Update Profile";
-                document.getElementById('progressWrapper').style.display = "none";
-                document.getElementById('cancelBtn').style.display = "block";
-            }
+        } else {
+            window.location.href = "slog.html";
         }
-        document.querySelector('.form-container').style.display = "block";
     });
 
-    // Skill Logic
+    // Photo Preview Logic
+    const fileInput = document.getElementById('fileInput');
+    const photoPreview = document.getElementById('photoPreview');
+    fileInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photoPreview.innerHTML = `<img src="${e.target.result}">`;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Skill Tag Logic
+    let skills = [];
     const skillInput = document.getElementById('skillInput');
+    const skillList = document.getElementById('skillList');
+
     skillInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            const val = skillInput.value.trim();
-            if (val && !skills.includes(val)) {
-                skills.push(val); renderSkills(); skillInput.value = ''; updateProgress();
+            const skill = skillInput.value.trim();
+            if (skill && !skills.includes(skill)) {
+                skills.push(skill);
+                renderSkills();
+                skillInput.value = '';
+                updateProgress();
             }
         }
     });
 
     function renderSkills() {
-        document.getElementById('skillList').innerHTML = skills.map(s => `
+        skillList.innerHTML = skills.map(s => `
             <div class="skill-tag">${s} <i data-lucide="x" size="14" style="cursor:pointer" onclick="removeSkill('${s}')"></i></div>
         `).join('');
         lucide.createIcons();
     }
 
-    window.removeSkill = (skill) => { skills = skills.filter(s => s !== skill); renderSkills(); };
+    window.removeSkill = (skill) => {
+        skills = skills.filter(s => s !== skill);
+        renderSkills();
+    };
 
+    // Progress Bar
     window.updateProgress = () => {
         let score = 20;
         if(document.getElementById('fullName').value.length > 3) score += 40;
@@ -201,25 +238,23 @@
         document.getElementById('progressBar').style.width = score + "%";
     };
 
+    // Save Data
     document.getElementById('profileForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const saveBtn = document.getElementById('saveBtn');
-        saveBtn.innerText = "Synchronizing...";
+        saveBtn.innerText = "Securing Profile...";
         saveBtn.disabled = true;
 
         try {
             await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                name: document.getElementById('fullName').value, // Used 'name' to match dashboard greeting
+                fullName: document.getElementById('fullName').value,
                 regNo: document.getElementById('regNo').value,
                 dept: document.getElementById('dept').value,
-                degree: document.getElementById('degree').value,
-                gradYear: document.getElementById('gradYear').value,
                 cgpa: document.getElementById('cgpa').value,
                 skills: skills,
                 summary: document.getElementById('summary').value,
-                profileComplete: true
+                profileComplete: true // THIS IS THE KEY FLAG
             });
-            alert("Profile Synced!");
             window.location.href = "sdashboard.html";
         } catch (err) {
             alert("Error: " + err.message);
