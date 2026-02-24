@@ -2,73 +2,187 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>HireX | Deploy Assessment</title>
+    <title>HireX | Secure Assessment Architect</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #D4AF37; --bg: #080808; --border: rgba(212,175,55,0.3); }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; padding: 50px; }
-        .form-container { max-width: 700px; margin: auto; background: rgba(15,15,15,0.95); padding: 40px; border: 1px solid var(--border); border-radius: 24px; }
-        .badge { display: inline-block; padding: 6px 15px; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); border-radius: 20px; color: var(--gold); font-size: 0.7rem; text-transform: uppercase; font-weight: 700; margin-bottom: 20px; }
-        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #333; background: #000; color: white; outline: none; }
-        .btn-deploy { width: 100%; padding: 18px; background: linear-gradient(135deg, #D4AF37, #B8860B); color: black; border: none; font-weight: 800; cursor: pointer; border-radius: 12px; text-transform: uppercase; }
-        .q-block { background: rgba(255,255,255,0.03); padding: 25px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        :root { --gold: #D4AF37; --bg: #080808; --border: rgba(212,175,55,0.3); --glass: rgba(255,255,255,0.03); --error: #ff4444; --secure: #22c55e; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; padding: 40px; margin: 0; background-image: radial-gradient(circle at top right, #1a1a1a, #080808); min-height: 100vh; }
+        
+        .form-container { max-width: 850px; margin: auto; background: rgba(15,15,15,0.95); padding: 45px; border: 1px solid var(--border); border-radius: 28px; box-shadow: 0 25px 60px rgba(0,0,0,0.8); backdrop-filter: blur(10px); }
+        
+        .header-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; border-bottom: 1px solid #222; padding-bottom: 20px; }
+        .badge { padding: 6px 16px; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); border-radius: 30px; color: var(--gold); font-size: 0.7rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1.5px; }
+        
+        .security-banner { background: rgba(34, 197, 94, 0.05); border: 1px solid var(--secure); color: var(--secure); padding: 15px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; }
+
+        input, select, textarea { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid #222; background: #000; color: white; outline: none; transition: 0.3s; box-sizing: border-box; }
+        input:focus, textarea:focus { border-color: var(--gold); box-shadow: 0 0 15px rgba(212,175,55,0.15); }
+        
+        .q-block { background: var(--glass); padding: 35px; border-radius: 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.05); position: relative; transition: 0.3s; }
+        .q-block:hover { border-color: rgba(212,175,55,0.2); }
+        
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        
+        .btn-deploy { width: 100%; padding: 22px; background: linear-gradient(135deg, #D4AF37, #B8860B); color: black; border: none; font-weight: 900; cursor: pointer; border-radius: 18px; text-transform: uppercase; letter-spacing: 2px; margin-top: 25px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-deploy:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(212,175,55,0.3); }
+        .btn-deploy:disabled { background: #333; cursor: not-allowed; transform: none; box-shadow: none; color: #666; }
+        
+        .btn-add { background: rgba(255,255,255,0.02); border: 1px dashed var(--gold); color: var(--gold); width: 100%; padding: 18px; border-radius: 15px; cursor: pointer; margin-bottom: 25px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-add:hover { background: rgba(212,175,55,0.05); }
+
+        .remove-q { position: absolute; top: 25px; right: 25px; color: #555; cursor: pointer; transition: 0.3s; }
+        .remove-q:hover { color: var(--error); }
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
     <div class="form-container">
-        <span id="testType" class="badge">Type</span>
-        <h2 id="heading" style="margin-bottom:30px;">Initialize Assessment</h2>
-        <input type="text" id="title" placeholder="Test Title (e.g. Quants Mock 1)">
+        <div class="header-flex">
+            <div>
+                <span id="testType" class="badge">Aptitude</span>
+                <h2 id="heading" style="margin: 15px 0 5px 0; font-size: 2.2rem; font-weight: 800;">Architect Module</h2>
+            </div>
+            <a href="apti.html" style="color: #666; text-decoration: none; font-size: 0.8rem; font-weight: 800; border: 1px solid #333; padding: 8px 15px; border-radius: 10px; transition: 0.3s;">
+                EXIT MODULE
+            </a>
+        </div>
+
+        <div class="security-banner">
+            <i data-lucide="shield-check" size="20"></i>
+            <span><strong>Cloud-Sync Protocol:</strong> Questions are encrypted and synced to <code>test_drafts</code>.</span>
+        </div>
+        
+        <label style="color: #888; font-size: 0.75rem; font-weight: 800; margin-bottom: 8px; display: block; letter-spacing: 1px;">MODULE TITLE</label>
+        <input type="text" id="title" placeholder="e.g., Quantitative Ability - Set A">
+        
         <div id="questions"></div>
-        <button onclick="addQ()" style="background:none; border:1px dashed var(--gold); color:var(--gold); width:100%; padding:12px; border-radius:10px; cursor:pointer; margin-bottom:20px;">+ Add Question</button>
-        <button class="btn-deploy" id="deployBtn">Deploy to Students</button>
+
+        <button onclick="addQ()" class="btn-add">
+            <i data-lucide="plus-circle" size="20"></i> Add Question
+        </button>
+
+        <button class="btn-deploy" id="deployBtn">
+            <i data-lucide="cloud-upload" size="22"></i> Sync Module to Hub
+        </button>
     </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    const firebaseConfig = { apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", authDomain: "hirex-73d04.firebaseapp.com", projectId: "hirex-73d04", storageBucket: "hirex-73d04.firebasestorage.app", appId: "1:435154197357:web:5dbce3288c6a2771685864" };
-    const db = getFirestore(initializeApp(firebaseConfig));
-    const auth = getAuth();
+    const firebaseConfig = { 
+        apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", 
+        authDomain: "hirex-73d04.firebaseapp.com", 
+        projectId: "hirex-73d04", 
+        storageBucket: "hirex-73d04.firebasestorage.app", 
+        appId: "1:435154197357:web:5dbce3288c6a2771685864" 
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
     const params = new URLSearchParams(window.location.search);
-    const category = params.get("type") || "general";
-    document.getElementById("testType").innerText = category;
-    document.getElementById("heading").innerText = `Deploy ${category.charAt(0).toUpperCase() + category.slice(1)} Test`;
+    const category = params.get("type") || "quants";
+    
+    document.getElementById("testType").innerText = category.toUpperCase();
+    document.getElementById("heading").innerText = `Configure ${category.toUpperCase()}`;
 
+    let qCount = 0;
     window.addQ = () => {
+        qCount++;
         const div = document.createElement("div");
         div.className = "q-block";
-        div.innerHTML = `<input type="text" class="q-val" placeholder="Technical Question"><input type="text" class="a-val" placeholder="Correct Answer">`;
+        div.id = `q-container-${qCount}`;
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <span style="font-size:0.75rem; font-weight:800; color:var(--gold); letter-spacing:1px;">ITEM #${qCount}</span>
+                <span class="remove-q" onclick="document.getElementById('q-container-${qCount}').remove();"><i data-lucide="trash-2" size="18"></i></span>
+            </div>
+            <textarea class="q-val" placeholder="Define the question prompt..." rows="3"></textarea>
+            <div class="options-grid">
+                <input type="text" class="opt" placeholder="Option A" required>
+                <input type="text" class="opt" placeholder="Option B" required>
+                <input type="text" class="opt" placeholder="Option C" required>
+                <input type="text" class="opt" placeholder="Option D" required>
+            </div>
+            <div style="margin-top:20px; display:flex; align-items:center; gap:15px;">
+                <label style="font-size:0.8rem; color:#888;">Key:</label>
+                <select class="a-val" style="margin-bottom:0; border-color:var(--gold); background: rgba(212,175,55,0.05);">
+                    <option value="A">Option A</option>
+                    <option value="B">Option B</option>
+                    <option value="C">Option C</option>
+                    <option value="D">Option D</option>
+                </select>
+            </div>
+        `;
         document.getElementById("questions").appendChild(div);
+        lucide.createIcons();
     };
+
+    // Initialize with 1 question
     addQ();
 
     document.getElementById("deployBtn").onclick = async () => {
+        const btn = document.getElementById("deployBtn");
         const title = document.getElementById("title").value.trim();
         const qBlocks = document.querySelectorAll(".q-block");
+        
+        if(!title) return alert("Please specify a module title.");
+        if(qBlocks.length === 0) return alert("Add at least one question.");
+
         const questions = Array.from(qBlocks).map(b => ({
-            question: b.querySelector(".q-val").value,
+            question: b.querySelector(".q-val").value.trim(),
+            options: {
+                A: b.querySelectorAll(".opt")[0].value.trim(),
+                B: b.querySelectorAll(".opt")[1].value.trim(),
+                C: b.querySelectorAll(".opt")[2].value.trim(),
+                D: b.querySelectorAll(".opt")[3].value.trim()
+            },
             answer: b.querySelector(".a-val").value
         }));
 
-        if(!title || questions[0].question === "") return alert("Please fill assessment details.");
+        // Validate empty fields
+        if(questions.some(q => !q.question || !q.options.A || !q.options.B)) {
+            return alert("All question and option fields must be filled.");
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> ARCHIVING TO CLOUD...`;
+        lucide.createIcons();
 
         try {
-            // Find all students for instant assignment
-            const studentSnap = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
-            const assignedTo = studentSnap.docs.map(d => d.id);
+            const docId = `draft_${category.toLowerCase()}`;
+            
+            const payload = {
+                title,
+                category: category.toLowerCase(),
+                questions,
+                updatedAt: serverTimestamp(),
+                facultyId: auth.currentUser ? auth.currentUser.uid : "ANONYMOUS_FACULTY"
+            };
 
-            await addDoc(collection(db, "tests"), {
-                title, category, questions, status: "active", assignedTo,
-                createdBy: auth.currentUser.uid, createdAt: serverTimestamp()
-            });
+            // 1. Sync to Firestore
+            await setDoc(doc(db, "test_drafts", docId), payload);
 
-            alert(`Assessment ${title} Deployed.`);
-            window.location.href = "faculty-dashboard.html";
-        } catch(e) { alert("System Sync Error."); }
+            // 2. Local Cache Update (Fixed: Saving stringified JSON instead of "ready")
+            localStorage.setItem('test_' + category.toLowerCase(), JSON.stringify(payload));
+
+            alert(`${category.toUpperCase()} Module Securely Synced!`);
+            window.location.href = "apti.html";
+        } catch(e) {
+            console.error(e);
+            alert("Security Protocol Error: " + e.message);
+            btn.disabled = false;
+            btn.innerHTML = `<i data-lucide="cloud-upload" size="22"></i> Retry Sync`;
+            lucide.createIcons();
+        }
     };
+
+    lucide.createIcons();
 </script>
 </body>
 </html>

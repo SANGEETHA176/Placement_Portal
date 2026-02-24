@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HireX | Secure Assessment Environment</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        :root { --gold: #D4AF37; --bg: #080808; --border: rgba(212,175,55,0.3); --error: #ff4444; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; overflow-x: hidden; user-select: none; }
+        
+        /* Proctored Header */
+        .proctor-header { background: #111; padding: 15px 40px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .timer { font-family: monospace; color: var(--gold); font-size: 1.5rem; font-weight: bold; }
+        
+        .test-container { max-width: 800px; margin: 40px auto; padding: 20px; }
+        .q-card { background: rgba(255,255,255,0.03); padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; }
+        
+        .option-btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #000; border: 1px solid #333; color: white; text-align: left; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+        .option-btn:hover { border-color: var(--gold); background: rgba(212,175,55,0.05); }
+        .option-btn.selected { border-color: var(--gold); background: var(--gold); color: black; font-weight: bold; }
+
+        .hint-box { background: rgba(52, 152, 219, 0.1); border: 1px solid #3498db; color: #3498db; padding: 15px; border-radius: 10px; margin-top: 20px; display: none; }
+        
+        .security-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    </style>
+</head>
+<body oncontextmenu="return false;"> <div id="blocker" class="security-overlay">
+        <i data-lucide="shield-alert" size="64" color="#ff4444"></i>
+        <h1 style="color:var(--error)">Security Violation Detected</h1>
+        <p>You switched tabs. This incident has been logged for HR audit.</p>
+        <button onclick="resumeTest()" style="padding:10px 30px; background:var(--gold); border:none; border-radius:8px; cursor:pointer;">I Understand, Resume</button>
+    </div>
+
+    <div class="proctor-header">
+        <div>
+            <h3 id="testTitle" style="margin:0;">Loading Assessment...</h3>
+            <span id="entryStatus" style="font-size: 0.7rem; color: #22c55e;">● SECURE CONNECTION ACTIVE</span>
+        </div>
+        <div class="timer" id="timer">00:00</div>
+        <button id="submitBtn" style="background:var(--gold); color:black; border:none; padding:10px 25px; border-radius:8px; font-weight:bold; cursor:pointer;">Submit Test</button>
+    </div>
+
+    <div class="test-container" id="examPaper">
+        </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, getDoc, addDoc, collection, serverTimestamp, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", authDomain: "hirex-73d04.firebaseapp.com", projectId: "hirex-73d04", storageBucket: "hirex-73d04.firebasestorage.app", appId: "1:435154197357:web:5dbce3288c6a2771685864" };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+
+    let tabSwitches = 0;
+    let testData = null;
+    let startTime = Date.now();
+
+    // 1. SECURITY: Tab Switch Detection
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+            tabSwitches++;
+            document.getElementById("blocker").style.display = "flex";
+            // Log violation to Firebase immediately
+            console.log("Violation Logged: Tab Switch #" + tabSwitches);
+        }
+    });
+
+    window.resumeTest = () => document.getElementById("blocker").style.display = "none";
+
+    // 2. LOAD TEST DATA
+    const params = new URLSearchParams(window.location.search);
+    const testId = params.get("id"); // URL should be test-view.html?id=DOCUMENT_ID
+
+    async function loadTest() {
+        const docRef = doc(db, "tests", testId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            testData = docSnap.data();
+            document.getElementById("testTitle").innerText = testData.title;
+            renderQuestions(testData.questions);
+            
+            // HR AUDIT: Log Entry Time
+            console.log("Entry Time Logged for HR audit");
+        }
+    }
+
+    function renderQuestions(questions) {
+        const container = document.getElementById("examPaper");
+        questions.forEach((q, index) => {
+            const html = `
+                <div class="q-card" data-qindex="${index}">
+                    <p><strong>Q${index+1}:</strong> ${q.question}</p>
+                    <div class="options">
+                        ${Object.entries(q.options).map(([key, val]) => `
+                            <button class="option-btn" onclick="selectOpt(this, '${key}')">${val}</button>
+                        `).join('')}
+                    </div>
+                    ${testData.isMock ? `<button onclick="this.nextElementSibling.style.display='block'" style="margin-top:15px; background:none; border:none; color:#3498db; cursor:pointer;">💡 View Hint</button>
+                    <div class="hint-box">${q.hint}</div>` : ''}
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+        });
+    }
+
+    window.selectOpt = (btn, sel) => {
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        btn.setAttribute("data-selected", sel);
+    };
+
+    // 3. SUBMIT & EMAIL FEEDBACK
+    document.getElementById("submitBtn").onclick = async () => {
+        const answers = [];
+        let score = 0;
+        let feedbackContent = "";
+
+        document.querySelectorAll('.q-card').forEach((card, i) => {
+            const selected = card.querySelector('.selected')?.getAttribute("data-selected");
+            const correct = testData.questions[i].answer;
+            if(selected === correct) score++;
+            
+            feedbackContent += `Q${i+1}: ${testData.questions[i].explanation}\n\n`;
+        });
+
+        const finalPercent = Math.round((score / testData.questions.length) * 100);
+
+        // Save to Firebase (For HR Gradebook)
+        await addDoc(collection(db, "test_submissions"), {
+            testId,
+            studentId: auth.currentUser?.uid || "Anonymous",
+            studentName: auth.currentUser?.displayName || "Student",
+            score: finalPercent,
+            tabSwitches,
+            entryTime: new Date(startTime),
+            submittedAt: serverTimestamp(),
+            testCategory: testData.category
+        });
+
+        // EMAIL FEEDBACK (MOCK ONLY)
+        if(testData.isMock) {
+            emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", {
+                student_email: auth.currentUser.email,
+                score: finalPercent,
+                feedback: feedbackContent
+            }).then(() => alert("Results emailed to your inbox!"));
+        }
+
+        alert("Test Submitted Successfully!");
+        window.location.href = "student-dashboard.html";
+    };
+
+    loadTest();
+    lucide.createIcons();
+</script>
+</body>
+</html>

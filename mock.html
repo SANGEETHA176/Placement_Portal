@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HireX | Mock Assessment Architect</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #D4AF37; --bg: #080808; --border: rgba(212,175,55,0.3); --glass: rgba(255,255,255,0.03); --hint: #3498db; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; padding: 40px; }
+        
+        .form-container { max-width: 850px; margin: auto; background: rgba(15,15,15,0.98); padding: 45px; border: 1px solid var(--border); border-radius: 28px; box-shadow: 0 25px 60px rgba(0,0,0,0.6); }
+        
+        .header-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+        .badge { padding: 6px 16px; background: rgba(52, 152, 219, 0.1); border: 1px solid var(--hint); border-radius: 30px; color: var(--hint); font-size: 0.7rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1.5px; }
+        
+        input, select, textarea { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid #222; background: #000; color: white; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--gold); }
+        
+        .q-block { background: var(--glass); padding: 30px; border-radius: 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+
+        /* Mock Specific Fields */
+        .mock-extra { background: rgba(52, 152, 219, 0.05); padding: 20px; border-radius: 12px; margin-top: 15px; border: 1px solid rgba(52, 152, 219, 0.2); }
+        .mock-label { font-size: 0.65rem; color: var(--hint); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 8px; }
+
+        .btn-deploy { width: 100%; padding: 20px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; font-weight: 900; cursor: pointer; border-radius: 15px; text-transform: uppercase; letter-spacing: 2px; margin-top: 25px; transition: 0.4s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-add { background: none; border: 1px dashed var(--hint); color: var(--hint); width: 100%; padding: 18px; border-radius: 15px; cursor: pointer; margin-bottom: 25px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        
+        .remove-q { position: absolute; top: 25px; right: 25px; color: #555; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <div class="header-flex">
+            <div>
+                <span class="badge">Practice Mode</span>
+                <h2 style="margin: 15px 0 5px 0; font-size: 2rem;">Mock Test Creator</h2>
+                <p style="color: #666; font-size: 0.9rem;">Include hints and explanations. Results will be emailed to candidates.</p>
+            </div>
+            <a href="faculty-dashboard.html" style="color: #444; text-decoration: none; font-size: 0.75rem;">EXIT ✕</a>
+        </div>
+        
+        <label style="font-size: 0.7rem; color: #888; font-weight: 900; margin-bottom: 10px; display: block;">MOCK TEST TITLE</label>
+        <input type="text" id="title" placeholder="e.g. Weekly Python Practice - Basic Strings">
+        
+        <div id="questions"></div>
+
+        <button onclick="addQ()" class="btn-add">
+            <i data-lucide="plus-circle" size="20"></i> Add Practice Question
+        </button>
+
+        <button class="btn-deploy" id="deployBtn">
+            <i data-lucide="mail" size="20"></i> Deploy & Enable Email Feedback
+        </button>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // Initialize EmailJS (You will need your own Public Key from emailjs.com)
+    emailjs.init("YOUR_PUBLIC_KEY");
+
+    const firebaseConfig = { apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", authDomain: "hirex-73d04.firebaseapp.com", projectId: "hirex-73d04", storageBucket: "hirex-73d04.firebasestorage.app", appId: "1:435154197357:web:5dbce3288c6a2771685864" };
+    const db = getFirestore(initializeApp(firebaseConfig));
+
+    let qCount = 0;
+    window.addQ = () => {
+        qCount++;
+        const div = document.createElement("div");
+        div.className = "q-block";
+        div.innerHTML = `
+            <span class="remove-q" onclick="this.parentElement.remove();"><i data-lucide="x" size="20"></i></span>
+            <textarea class="q-val" placeholder="Question description..." rows="2"></textarea>
+            
+            <div class="options-grid">
+                <input type="text" class="opt" placeholder="Option A" required>
+                <input type="text" class="opt" placeholder="Option B" required>
+                <input type="text" class="opt" placeholder="Option C" required>
+                <input type="text" class="opt" placeholder="Option D" required>
+            </div>
+            
+            <select class="a-val" style="margin-top:10px;">
+                <option value="A">Correct: Option A</option>
+                <option value="B">Correct: Option B</option>
+                <option value="C">Correct: Option C</option>
+                <option value="D">Correct: Option D</option>
+            </select>
+
+            <div class="mock-extra">
+                <span class="mock-label">Hint for Student (Visible during test)</span>
+                <input type="text" class="h-val" placeholder="e.g. Think about the 'for' loop structure...">
+                
+                <span class="mock-label">Detailed Explanation (Sent via Email after test)</span>
+                <textarea class="e-val" placeholder="Explain why the answer is correct..." rows="2"></textarea>
+            </div>
+        `;
+        document.getElementById("questions").appendChild(div);
+        lucide.createIcons();
+    };
+
+    addQ();
+
+    document.getElementById("deployBtn").onclick = async () => {
+        const title = document.getElementById("title").value.trim();
+        const qBlocks = document.querySelectorAll(".q-block");
+        
+        const questions = Array.from(qBlocks).map(b => ({
+            question: b.querySelector(".q-val").value,
+            options: {
+                A: b.querySelectorAll(".opt")[0].value,
+                B: b.querySelectorAll(".opt")[1].value,
+                C: b.querySelectorAll(".opt")[2].value,
+                D: b.querySelectorAll(".opt")[3].value
+            },
+            answer: b.querySelector(".a-val").value,
+            hint: b.querySelector(".h-val").value,
+            explanation: b.querySelector(".e-val").value
+        }));
+
+        if(!title || questions.some(q => q.question === "")) return alert("Please fill mock details.");
+
+        try {
+            const studentSnap = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
+            const assignedTo = studentSnap.docs.map(d => d.id);
+
+            await addDoc(collection(db, "tests"), {
+                title,
+                category: "Mock",
+                questions,
+                isMock: true,
+                emailFeedback: true, // Trigger for the student view to send mail
+                assignedTo,
+                createdAt: serverTimestamp()
+            });
+
+            alert(`Mock Test "${title}" deployed. Students will receive email feedback upon completion.`);
+            window.location.href = "faculty-dashboard.html";
+        } catch(e) { alert("Deployment Error."); }
+    };
+    lucide.createIcons();
+</script>
+</body>
+</html>

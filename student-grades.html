@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HireX | Candidate Audit Center</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #D4AF37; --bg: #080808; --card: #111; --border: rgba(212,175,55,0.2); --safe: #22c55e; --warn: #ef4444; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; margin: 0; padding: 40px; }
+        
+        .container { max-width: 1200px; margin: auto; }
+        .header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+        
+        /* Stats Ribbon */
+        .stats-ribbon { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--card); border: 1px solid var(--border); padding: 20px; border-radius: 15px; }
+        .stat-card small { color: #666; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
+        .stat-card div { font-size: 1.5rem; font-weight: 800; color: var(--gold); margin-top: 5px; }
+
+        /* Audit Table */
+        .audit-table-wrapper { background: var(--card); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: rgba(212, 175, 55, 0.05); padding: 20px; font-size: 0.75rem; text-transform: uppercase; color: var(--gold); letter-spacing: 1px; }
+        td { padding: 20px; border-bottom: 1px solid #222; font-size: 0.9rem; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge-secure { background: rgba(34, 197, 94, 0.1); color: var(--safe); padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+        .badge-violation { background: rgba(239, 68, 68, 0.1); color: var(--warn); padding: 5px 12px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+        
+        .time-text { font-family: 'Courier New', monospace; color: #888; }
+        .btn-refresh { background: var(--gold); color: black; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <div>
+            <h1 style="font-family: 'Playfair Display'; font-size: 2.5rem; margin: 0;">Audit Command Center</h1>
+            <p style="color: #666; margin: 5px 0 0 0;">Monitoring candidate entry, timing, and security integrity.</p>
+        </div>
+        <button class="btn-refresh" onclick="location.reload()">
+            <i data-lucide="refresh-cw" size="18"></i> Sync Logs
+        </button>
+    </header>
+
+    <div class="stats-ribbon">
+        <div class="stat-card">
+            <small>Total Participants</small>
+            <div id="totalCandidates">0</div>
+        </div>
+        <div class="stat-card">
+            <small>Security Violations</small>
+            <div id="violations" style="color: var(--warn);">0</div>
+        </div>
+        <div class="stat-card">
+            <small>Avg. Completion Time</small>
+            <div id="avgTime">--</div>
+        </div>
+    </div>
+
+    
+
+    <div class="audit-table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Candidate</th>
+                    <th>Test Module</th>
+                    <th>Entry Timestamp</th>
+                    <th>Exit Timestamp</th>
+                    <th>Security Logs</th>
+                    <th>Final Score</th>
+                </tr>
+            </thead>
+            <tbody id="logsBody">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", authDomain: "hirex-73d04.firebaseapp.com", projectId: "hirex-73d04", storageBucket: "hirex-73d04.firebasestorage.app", appId: "1:435154197357:web:5dbce3288c6a2771685864" };
+    const db = getFirestore(initializeApp(firebaseConfig));
+
+    async function loadAuditLogs() {
+        const logsBody = document.getElementById("logsBody");
+        const resultsSnap = await getDocs(query(collection(db, "test_submissions"), orderBy("submittedAt", "desc")));
+        
+        let violationCount = 0;
+        logsBody.innerHTML = "";
+
+        resultsSnap.forEach(doc => {
+            const data = doc.data();
+            
+            // Format timestamps for HR visibility
+            const entryTime = data.entryTime ? new Date(data.entryTime.seconds * 1000).toLocaleTimeString() : "N/A";
+            const exitTime = data.submittedAt ? new Date(data.submittedAt.seconds * 1000).toLocaleTimeString() : "In Progress";
+            
+            // Security check logic
+            const hasViolations = data.tabSwitches > 2;
+            if(hasViolations) violationCount++;
+
+            const row = `
+                <tr>
+                    <td>
+                        <div style="font-weight:700;">${data.studentName}</div>
+                        <div style="font-size:0.7rem; color:#555;">ID: ${data.studentId}</div>
+                    </td>
+                    <td><span class="badge" style="background:#222; padding:4px 8px; border-radius:4px; font-size:0.7rem;">${data.testCategory}</span></td>
+                    <td class="time-text">${entryTime}</td>
+                    <td class="time-text">${exitTime}</td>
+                    <td>
+                        ${hasViolations ? 
+                            `<span class="badge-violation"><i data-lucide="alert-triangle" size="12"></i> ${data.tabSwitches} TAB SWITCHES</span>` : 
+                            `<span class="badge-secure"><i data-lucide="shield-check" size="12"></i> SECURE ENTRY</span>`}
+                    </td>
+                    <td style="font-weight:800; color:var(--gold); font-size:1.1rem;">${data.score}%</td>
+                </tr>
+            `;
+            logsBody.insertAdjacentHTML('beforeend', row);
+        });
+
+        document.getElementById("totalCandidates").innerText = resultsSnap.size;
+        document.getElementById("violations").innerText = violationCount;
+        lucide.createIcons();
+    }
+
+    loadAuditLogs();
+</script>
+</body>
+</html>
