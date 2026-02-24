@@ -2,79 +2,119 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>HireX | Mock Assessment Architect</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireX | Mock Test Architect</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --gold: #D4AF37; --bg: #080808; --border: rgba(212,175,55,0.3); --glass: rgba(255,255,255,0.03); --hint: #3498db; }
-        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; padding: 40px; }
-        
-        .form-container { max-width: 850px; margin: auto; background: rgba(15,15,15,0.98); padding: 45px; border: 1px solid var(--border); border-radius: 28px; box-shadow: 0 25px 60px rgba(0,0,0,0.6); }
-        
-        .header-flex { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
-        .badge { padding: 6px 16px; background: rgba(52, 152, 219, 0.1); border: 1px solid var(--hint); border-radius: 30px; color: var(--hint); font-size: 0.7rem; text-transform: uppercase; font-weight: 800; letter-spacing: 1.5px; }
-        
-        input, select, textarea { width: 100%; padding: 16px; margin-bottom: 12px; border-radius: 14px; border: 1px solid #222; background: #000; color: white; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--gold); }
-        
-        .q-block { background: var(--glass); padding: 30px; border-radius: 20px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.05); position: relative; }
-        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        :root {
+            --brand-gold: #D4AF37;
+            --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F1D37E 50%, #B8860B 100%);
+            --bg-deep: #080808;
+            --bg-card: rgba(15, 15, 15, 0.95);
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --glass-border: rgba(212, 175, 55, 0.3);
+            --hint-blue: #3498db;
+        }
 
-        /* Mock Specific Fields */
-        .mock-extra { background: rgba(52, 152, 219, 0.05); padding: 20px; border-radius: 12px; margin-top: 15px; border: 1px solid rgba(52, 152, 219, 0.2); }
-        .mock-label { font-size: 0.65rem; color: var(--hint); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 8px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-deep); color: var(--text-main); padding: 50px 20px; }
 
-        .btn-deploy { width: 100%; padding: 20px; background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; font-weight: 900; cursor: pointer; border-radius: 15px; text-transform: uppercase; letter-spacing: 2px; margin-top: 25px; transition: 0.4s; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-add { background: none; border: 1px dashed var(--hint); color: var(--hint); width: 100%; padding: 18px; border-radius: 15px; cursor: pointer; margin-bottom: 25px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .container { max-width: 850px; margin: auto; }
+        .card { 
+            background: var(--bg-card); padding: 45px; border-radius: 28px; 
+            border: 1px solid var(--glass-border); box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        .badge { display: inline-block; padding: 6px 16px; background: rgba(52, 152, 219, 0.1); border: 1px solid var(--hint-blue); border-radius: 30px; color: var(--hint-blue); font-size: 0.7rem; text-transform: uppercase; font-weight: 800; margin-bottom: 25px; }
         
-        .remove-q { position: absolute; top: 25px; right: 25px; color: #555; cursor: pointer; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin-bottom: 30px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        label { display: block; font-size: 0.7rem; font-weight: 700; color: var(--brand-gold); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
+        input, select, textarea { 
+            width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #222; 
+            background: rgba(0,0,0,0.6); color: white; margin-bottom: 20px; outline: none; transition: 0.3s;
+        }
+        input:focus, textarea:focus { border-color: var(--brand-gold); }
+
+        /* Question Block */
+        .q-block { 
+            background: rgba(255,255,255,0.02); padding: 30px; border-radius: 20px; 
+            border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px; position: relative; 
+        }
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .opt-input { margin-bottom: 0; font-size: 0.9rem; }
+
+        .extra-tools { 
+            background: rgba(52, 152, 219, 0.05); padding: 20px; border-radius: 12px; 
+            border: 1px solid rgba(52, 152, 219, 0.2); margin-top: 15px;
+        }
+
+        .btn-add { 
+            width: 100%; padding: 15px; background: transparent; color: var(--brand-gold); 
+            border: 1px dashed var(--brand-gold); border-radius: 12px; cursor: pointer; 
+            margin-bottom: 30px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        
+        .btn-deploy { 
+            width: 100%; padding: 20px; background: var(--gold-gradient); color: black; 
+            border: none; border-radius: 15px; font-weight: 900; cursor: pointer; 
+            text-transform: uppercase; letter-spacing: 2px; transition: 0.3s;
+        }
+        .btn-deploy:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2); }
+
+        .remove-q { position: absolute; top: 20px; right: 20px; color: #555; cursor: pointer; background: none; border: none; }
     </style>
 </head>
 <body>
 
-    <div class="form-container">
-        <div class="header-flex">
-            <div>
-                <span class="badge">Practice Mode</span>
-                <h2 style="margin: 15px 0 5px 0; font-size: 2rem;">Mock Test Creator</h2>
-                <p style="color: #666; font-size: 0.9rem;">Include hints and explanations. Results will be emailed to candidates.</p>
-            </div>
-            <a href="faculty-dashboard.html" style="color: #444; text-decoration: none; font-size: 0.75rem;">EXIT ✕</a>
-        </div>
-        
-        <label style="font-size: 0.7rem; color: #888; font-weight: 900; margin-bottom: 10px; display: block;">MOCK TEST TITLE</label>
-        <input type="text" id="title" placeholder="e.g. Weekly Python Practice - Basic Strings">
-        
-        <div id="questions"></div>
+<div class="container">
+    <div class="card">
+        <span class="badge">Placement Simulator</span>
+        <h1>Mock Test Architect</h1>
 
-        <button onclick="addQ()" class="btn-add">
-            <i data-lucide="plus-circle" size="20"></i> Add Practice Question
+        <label>Examination Title</label>
+        <input type="text" id="mockTitle" placeholder="e.g., TCS Ninja Pattern Mock - Final Set">
+
+        <div id="questionsContainer"></div>
+
+        <button class="btn-add" id="addQuestionBtn">
+            <i data-lucide="plus-circle" size="18"></i> Add MCQ Block
         </button>
 
-        <button class="btn-deploy" id="deployBtn">
-            <i data-lucide="mail" size="20"></i> Deploy & Enable Email Feedback
-        </button>
+        <button class="btn-deploy" id="deployBtn">Initialize & Deploy</button>
     </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    // Initialize EmailJS (You will need your own Public Key from emailjs.com)
-    emailjs.init("YOUR_PUBLIC_KEY");
+    const firebaseConfig = { 
+        apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", 
+        authDomain: "hirex-73d04.firebaseapp.com", 
+        projectId: "hirex-73d04", 
+        storageBucket: "hirex-73d04.firebasestorage.app", 
+        appId: "1:435154197357:web:5dbce3288c6a2771685864" 
+    };
 
-    const firebaseConfig = { apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", authDomain: "hirex-73d04.firebaseapp.com", projectId: "hirex-73d04", storageBucket: "hirex-73d04.firebasestorage.app", appId: "1:435154197357:web:5dbce3288c6a2771685864" };
-    const db = getFirestore(initializeApp(firebaseConfig));
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    let qCount = 0;
-    window.addQ = () => {
-        qCount++;
+    onAuthStateChanged(auth, user => { if (!user) window.location.replace("flog.html"); });
+
+    function createQuestionBlock() {
+        const container = document.getElementById("questionsContainer");
         const div = document.createElement("div");
         div.className = "q-block";
         div.innerHTML = `
-            <span class="remove-q" onclick="this.parentElement.remove();"><i data-lucide="x" size="20"></i></span>
-            <textarea class="q-val" placeholder="Question description..." rows="2"></textarea>
+            <button class="remove-q" onclick="this.parentElement.remove()"><i data-lucide="x" size="20"></i></button>
+            <label>Question Context</label>
+            <textarea class="q-val" placeholder="Enter problem statement..." rows="2"></textarea>
             
             <div class="options-grid">
                 <input type="text" class="opt" placeholder="Option A" required>
@@ -83,31 +123,36 @@
                 <input type="text" class="opt" placeholder="Option D" required>
             </div>
             
-            <select class="a-val" style="margin-top:10px;">
-                <option value="A">Correct: Option A</option>
-                <option value="B">Correct: Option B</option>
-                <option value="C">Correct: Option C</option>
-                <option value="D">Correct: Option D</option>
+            <label>Correct Selection</label>
+            <select class="a-val">
+                <option value="A">Option A</option>
+                <option value="B">Option B</option>
+                <option value="C">Option C</option>
+                <option value="D">Option D</option>
             </select>
 
-            <div class="mock-extra">
-                <span class="mock-label">Hint for Student (Visible during test)</span>
-                <input type="text" class="h-val" placeholder="e.g. Think about the 'for' loop structure...">
-                
-                <span class="mock-label">Detailed Explanation (Sent via Email after test)</span>
-                <textarea class="e-val" placeholder="Explain why the answer is correct..." rows="2"></textarea>
+            <div class="extra-tools">
+                <label style="color:var(--hint-blue)">Pedagogical Hint (During Exam)</label>
+                <input type="text" class="h-val" placeholder="Helpful tip for the student...">
+                <label style="color:var(--hint-blue)">Full Solution (Post-Exam)</label>
+                <textarea class="e-val" placeholder="Explain the logic..." rows="2"></textarea>
             </div>
         `;
-        document.getElementById("questions").appendChild(div);
+        container.appendChild(div);
         lucide.createIcons();
-    };
+    }
 
-    addQ();
+    // Initialize with first block
+    createQuestionBlock();
+    document.getElementById("addQuestionBtn").onclick = createQuestionBlock;
 
     document.getElementById("deployBtn").onclick = async () => {
-        const title = document.getElementById("title").value.trim();
+        const title = document.getElementById("mockTitle").value.trim();
         const qBlocks = document.querySelectorAll(".q-block");
-        
+        const btn = document.getElementById("deployBtn");
+
+        if(!title) return alert("Please provide a Test Title.");
+
         const questions = Array.from(qBlocks).map(b => ({
             question: b.querySelector(".q-val").value,
             options: {
@@ -121,26 +166,37 @@
             explanation: b.querySelector(".e-val").value
         }));
 
-        if(!title || questions.some(q => q.question === "")) return alert("Please fill mock details.");
+        if(questions.some(q => !q.question)) return alert("One or more questions are incomplete.");
+
+        btn.innerText = "SYNCHRONIZING WITH HIREX NETWORK...";
+        btn.disabled = true;
 
         try {
+            // Fetch all student IDs for assignment
             const studentSnap = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
-            const assignedTo = studentSnap.docs.map(d => d.id);
+            const studentIds = studentSnap.docs.map(d => d.id);
 
             await addDoc(collection(db, "tests"), {
                 title,
-                category: "Mock",
+                category: "mock",
                 questions,
+                status: "active",
+                assignedTo: studentIds,
+                createdBy: auth.currentUser.uid,
                 isMock: true,
-                emailFeedback: true, // Trigger for the student view to send mail
-                assignedTo,
                 createdAt: serverTimestamp()
             });
 
-            alert(`Mock Test "${title}" deployed. Students will receive email feedback upon completion.`);
+            alert(`Mock Deployment Successful: ${title}`);
             window.location.href = "faculty-dashboard.html";
-        } catch(e) { alert("Deployment Error."); }
+        } catch(e) { 
+            console.error(e);
+            alert("Deployment failed."); 
+            btn.innerText = "Initialize & Deploy";
+            btn.disabled = false;
+        }
     };
+
     lucide.createIcons();
 </script>
 </body>
