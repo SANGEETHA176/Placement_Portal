@@ -22,7 +22,6 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            /* Using the same background theme for consistency */
             background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.85)), url('studback.png');
             background-size: cover;
             background-position: center;
@@ -215,11 +214,8 @@ const errorDisplay = document.getElementById("error-message");
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
     loginBtn.innerText = "Verifying...";
     loginBtn.disabled = true;
@@ -229,32 +225,33 @@ loginForm.addEventListener("submit", async (e) => {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Fetching the user document from Firestore
+        // 1. MANDATORY EMAIL VERIFICATION CHECK
+        // This stops the user here if they haven't clicked the link in their email.
+        if (!user.emailVerified) {
+            await signOut(auth);
+            return showError("Access Denied: Please verify your email link before logging in.");
+        }
+
+        // 2. ROLE VERIFICATION
         const userDoc = await getDoc(doc(db, "users", user.uid));
 
         if (!userDoc.exists()) {
             await signOut(auth);
-            return showError("Faculty profile not found.");
+            return showError("Faculty profile not found in system.");
         }
 
         const userData = userDoc.data();
 
-        // Validation for the 'faculty' role instead of 'student'
         if (userData.role !== "faculty") {
             await signOut(auth);
             return showError("Access Denied: Faculty portal only.");
         }
 
-        // Email verification check
-        if (!user.emailVerified) {
-            await signOut(auth);
-            return showError("Please verify your email before logging in.");
-        }
-
-        // Redirect to Faculty-specific dashboard
-        window.location.href = "faculty-dashboard.html";
+        // 3. SUCCESSFUL REDIRECT
+        window.location.replace("faculty-profile.html");
 
     } catch (error) {
+        // Handle wrong password or email errors
         showError("Invalid email or password.");
     }
 });
@@ -266,9 +263,7 @@ function showError(message) {
     loginBtn.disabled = false;
 }
 
-// Initializing Lucide icons
 lucide.createIcons();
 </script>
-
 </body>
 </html>

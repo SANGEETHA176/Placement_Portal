@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireX | Faculty Profile Setup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --brand-gold: #D4AF37;
+            --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F1D37E 50%, #B8860B 100%);
+            --bg-deep: #080808;
+            --bg-card: rgba(15, 15, 15, 0.95);
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --glass-border: rgba(212, 175, 55, 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        #setup-container { display: none; width: 100%; max-width: 550px; animation: fadeIn 0.8s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .profile-card {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .icon-box {
+            margin-bottom: 20px;
+            display: inline-block;
+            padding: 15px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--brand-gold);
+            border: 1px solid var(--glass-border);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left; }
+        .form-group { margin-bottom: 15px; }
+        .full-width { grid-column: span 2; }
+
+        label { display: block; font-size: 0.65rem; font-weight: 700; margin-bottom: 8px; text-transform: uppercase; color: var(--brand-gold); letter-spacing: 1px; }
+
+        input, select {
+            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333;
+            background-color: rgba(0, 0, 0, 0.6); color: var(--text-main); outline: none; transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        input:focus, select:focus { border-color: var(--brand-gold); }
+        input[readonly] { color: var(--text-muted); cursor: not-allowed; border-color: #222; }
+
+        .btn-save {
+            width: 100%; padding: 16px; background: var(--gold-gradient); color: #000;
+            border: none; border-radius: 12px; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 2px; cursor: pointer; margin-top: 20px; transition: 0.3s;
+        }
+        .btn-save:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    </style>
+</head>
+<body>
+
+<div id="setup-container">
+    <div class="profile-card">
+        <div class="icon-box">
+            <i data-lucide="user-cog" size="32"></i>
+        </div>
+        <h1>Profile Setup</h1>
+        <p class="subtitle">Complete your professional credentials.</p>
+
+        <form id="profileForm">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label>Full Name</label>
+                    <input type="text" id="facultyName" placeholder="Dr. John Doe" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label>Institutional Email</label>
+                    <input type="email" id="facultyEmail" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Designation</label>
+                    <select id="designation" required>
+                        <option value="" disabled selected>Select</option>
+                        <option value="Professor">Professor</option>
+                        <option value="Assistant Professor">Assistant Professor</option>
+                        <option value="Associate Professor">Associate Professor</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Department</label>
+                    <select id="department" required>
+                        <option value="" disabled selected>Select</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Engineering">Engineering</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Employee ID</label>
+                    <input type="text" id="employeeId" placeholder="FAC-101" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Experience (Years)</label>
+                    <input type="number" id="experience" placeholder="e.g. 5" min="0" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-save" id="saveBtn">Finalize Profile</button>
+        </form>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", 
+        authDomain: "hirex-73d04.firebaseapp.com", 
+        projectId: "hirex-73d04", 
+        storageBucket: "hirex-73d04.firebasestorage.app", 
+        messagingSenderId: "435154197357", 
+        appId: "1:435154197357:web:5dbce3288c6a2771685864" 
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.replace("flog.html");
+            return;
+        }
+
+        // Set email field immediately
+        document.getElementById("facultyEmail").value = user.email;
+
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        
+        if (userDoc.exists()) {
+            const data = userDoc.data();
+            
+            // Redirect if profile is already complete with all fields
+            if (data.profileCompleted && data.designation && data.experience) {
+                window.location.replace("faculty-dashboard.html");
+                return;
+            }
+        }
+        
+        document.getElementById("setup-container").style.display = "block";
+    });
+
+    document.getElementById("profileForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const saveBtn = document.getElementById("saveBtn");
+        saveBtn.innerText = "SAVING CREDENTIALS...";
+        saveBtn.disabled = true;
+
+        const profileData = {
+            name: document.getElementById("facultyName").value.trim(),
+            email: document.getElementById("facultyEmail").value,
+            designation: document.getElementById("designation").value,
+            department: document.getElementById("department").value,
+            employeeId: document.getElementById("employeeId").value.trim(),
+            experience: document.getElementById("experience").value,
+            profileCompleted: true
+        };
+
+        try {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), profileData);
+            alert("Terminal Setup Complete.");
+            window.location.replace("faculty-dashboard.html");
+        } catch (error) {
+            console.error("Setup Error:", error);
+            alert("Error: " + error.message);
+            saveBtn.innerText = "Finalize Profile";
+            saveBtn.disabled = false;
+        }
+    });
+
+    lucide.createIcons();
+</script>
+</body>
+</html>
