@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HireX | Aptitude Modules</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { --gold: #D4AF37; --bg: #080808; --card: rgba(15,15,15,0.95); --border: rgba(212,175,55,0.3); }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .container { width: 90%; max-width: 1100px; text-align: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-top: 50px; }
+        .card { background: var(--card); border: 1px solid var(--border); padding: 50px; border-radius: 24px; cursor: pointer; transition: 0.3s; }
+        .card:hover { border-color: var(--gold); transform: scale(1.03); }
+        .card i { color: var(--gold); margin-bottom: 20px; }
+        .btn-back { position: absolute; top: 30px; left: 30px; color: var(--gold); text-decoration: none; font-weight: bold; font-size: 0.8rem; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <a href="faculty-dashboard.html" class="btn-back">← TERMINAL HOME</a>
+    <div class="container">
+        <h2 style="font-family:'Playfair Display'; font-size: 2.5rem;">Aptitude Domains</h2>
+        <div class="grid">
+            <div class="card" onclick="window.location.href='create-test.html?type=quants'"><i data-lucide="calculator" size="40"></i><h3>Quantitative</h3></div>
+            <div class="card" onclick="window.location.href='create-test.html?type=logical'"><i data-lucide="brain" size="40"></i><h3>Logical</h3></div>
+            <div class="card" onclick="window.location.href='create-test.html?type=verbal'"><i data-lucide="languages" size="40"></i><h3>Verbal</h3></div>
+        </div>
+    </div>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

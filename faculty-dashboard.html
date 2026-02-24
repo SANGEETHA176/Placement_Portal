@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireX | Faculty Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --brand-gold: #D4AF37;
+            --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #F1D37E 50%, #B8860B 100%);
+            --bg-deep: #080808;
+            --bg-card: rgba(15, 15, 15, 0.95);
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --glass-border: rgba(212, 175, 55, 0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-deep); color: var(--text-main); display: flex; min-height: 100vh; overflow: hidden; }
+
+        /* Sidebar */
+        .sidebar { width: 280px; background: #0f0f0f; border-right: 1px solid var(--glass-border); padding: 40px 25px; display: flex; flex-direction: column; position: fixed; height: 100vh; z-index: 100; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 50px; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .nav-item { display: flex; align-items: center; gap: 12px; color: var(--text-muted); padding: 15px 0; cursor: pointer; transition: 0.3s; text-decoration: none; font-size: 0.9rem; }
+        .nav-item:hover, .nav-item.active { color: var(--brand-gold); }
+
+        /* Workspace */
+        .workspace { margin-left: 280px; padding: 60px; width: calc(100% - 280px); overflow-y: auto; height: 100vh; }
+        h2 { font-family: 'Playfair Display', serif; font-size: 2.2rem; margin-bottom: 10px; }
+        .subtitle { color: var(--text-muted); margin-bottom: 40px; }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .card { 
+            background: var(--bg-card); border: 1px solid var(--glass-border); padding: 45px 30px; border-radius: 24px; 
+            text-align: center; cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+        .card:hover { border-color: var(--brand-gold); transform: translateY(-10px); box-shadow: 0 15px 30px rgba(212,175,55,0.1); }
+        .card i { color: var(--brand-gold); margin-bottom: 25px; display: block; }
+        .card h3 { font-size: 1.4rem; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="logo">HireX</div>
+        <div class="nav-item active"><i data-lucide="layout-dashboard"></i> Dashboard</div>
+        <div class="nav-item" onclick="location.href='student-grades.html'"><i data-lucide="award"></i> Student Grades</div>
+        <div class="nav-item" onclick="location.href='announcements.html'"><i data-lucide="bell"></i> Announcements</div>
+        <div style="margin-top: auto;">
+            <div class="nav-item" id="logoutBtn"><i data-lucide="log-out"></i> Logout</div>
+        </div>
+    </nav>
+
+    <main class="workspace">
+        <header>
+            <h2>Faculty Command Center</h2>
+            <p class="subtitle">Select a specialized module to initialize student assessment.</p>
+        </header>
+
+        <div class="grid">
+            <div class="card" onclick="window.location.href='apti.html'">
+                <i data-lucide="brain-circuit" size="48"></i>
+                <h3>Aptitude</h3>
+                <p>Deploy Quants, Logical, and Verbal reasoning tests.</p>
+            </div>
+
+            <div class="card" onclick="window.location.href='code.html'">
+                <i data-lucide="code-2" size="48"></i>
+                <h3>Coding</h3>
+                <p>Create technical challenges and programming evaluations.</p>
+            </div>
+
+            <div class="card" onclick="window.location.href='mock.html'">
+                <i data-lucide="scroll-text" size="48"></i>
+                <h3>Mock Test</h3>
+                <p>Full-length simulated placement papers for all students.</p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", 
+            authDomain: "hirex-73d04.firebaseapp.com", 
+            projectId: "hirex-73d04", 
+            storageBucket: "hirex-73d04.firebasestorage.app", 
+            appId: "1:435154197357:web:5dbce3288c6a2771685864" 
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Protection Gate
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return window.location.replace("flog.html");
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (!userDoc.exists() || !userDoc.data().profileCompleted) {
+                window.location.replace("faculty-profile.html");
+            }
+        });
+
+        document.getElementById("logoutBtn").onclick = () => signOut(auth).then(() => location.replace("flog.html"));
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HireX | Deploy Assessment</title>
+    <style>
+        :root { --gold: #D4AF37; --bg: #080808; --border: rgba(212,175,55,0.3); }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; padding: 50px; }
+        .form-container { max-width: 700px; margin: auto; background: rgba(15,15,15,0.95); padding: 40px; border: 1px solid var(--border); border-radius: 24px; }
+        .badge { display: inline-block; padding: 6px 15px; background: rgba(212,175,55,0.1); border: 1px solid var(--gold); border-radius: 20px; color: var(--gold); font-size: 0.7rem; text-transform: uppercase; font-weight: 700; margin-bottom: 20px; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border-radius: 12px; border: 1px solid #333; background: #000; color: white; outline: none; }
+        .btn-deploy { width: 100%; padding: 18px; background: linear-gradient(135deg, #D4AF37, #B8860B); color: black; border: none; font-weight: 800; cursor: pointer; border-radius: 12px; text-transform: uppercase; }
+        .q-block { background: rgba(255,255,255,0.03); padding: 25px; border-radius: 15px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <span id="testType" class="badge">Type</span>
+        <h2 id="heading" style="margin-bottom:30px;">Initialize Assessment</h2>
+        <input type="text" id="title" placeholder="Test Title (e.g. Quants Mock 1)">
+        <div id="questions"></div>
+        <button onclick="addQ()" style="background:none; border:1px dashed var(--gold); color:var(--gold); width:100%; padding:12px; border-radius:10px; cursor:pointer; margin-bottom:20px;">+ Add Question</button>
+        <button class="btn-deploy" id="deployBtn">Deploy to Students</button>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    const firebaseConfig = { apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", authDomain: "hirex-73d04.firebaseapp.com", projectId: "hirex-73d04", storageBucket: "hirex-73d04.firebasestorage.app", appId: "1:435154197357:web:5dbce3288c6a2771685864" };
+    const db = getFirestore(initializeApp(firebaseConfig));
+    const auth = getAuth();
+
+    const params = new URLSearchParams(window.location.search);
+    const category = params.get("type") || "general";
+    document.getElementById("testType").innerText = category;
+    document.getElementById("heading").innerText = `Deploy ${category.charAt(0).toUpperCase() + category.slice(1)} Test`;
+
+    window.addQ = () => {
+        const div = document.createElement("div");
+        div.className = "q-block";
+        div.innerHTML = `<input type="text" class="q-val" placeholder="Technical Question"><input type="text" class="a-val" placeholder="Correct Answer">`;
+        document.getElementById("questions").appendChild(div);
+    };
+    addQ();
+
+    document.getElementById("deployBtn").onclick = async () => {
+        const title = document.getElementById("title").value.trim();
+        const qBlocks = document.querySelectorAll(".q-block");
+        const questions = Array.from(qBlocks).map(b => ({
+            question: b.querySelector(".q-val").value,
+            answer: b.querySelector(".a-val").value
+        }));
+
+        if(!title || questions[0].question === "") return alert("Please fill assessment details.");
+
+        try {
+            // Find all students for instant assignment
+            const studentSnap = await getDocs(query(collection(db, "users"), where("role", "==", "student")));
+            const assignedTo = studentSnap.docs.map(d => d.id);
+
+            await addDoc(collection(db, "tests"), {
+                title, category, questions, status: "active", assignedTo,
+                createdBy: auth.currentUser.uid, createdAt: serverTimestamp()
+            });
+
+            alert(`Assessment ${title} Deployed.`);
+            window.location.href = "faculty-dashboard.html";
+        } catch(e) { alert("System Sync Error."); }
+    };
+</script>
+</body>
+</html>
