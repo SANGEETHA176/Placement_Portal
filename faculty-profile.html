@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HireX | Faculty Profile</title>
+    <title>HireX | Faculty Profile Setup</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -39,7 +39,6 @@
             border: 1px solid var(--glass-border);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
             text-align: center;
-            position: relative;
         }
 
         .icon-box {
@@ -83,11 +82,6 @@
             letter-spacing: 2px; cursor: pointer; margin-top: 20px; transition: 0.3s;
         }
         .btn-save:hover { transform: translateY(-2px); filter: brightness(1.1); }
-
-        .btn-cancel {
-            display: block; margin-top: 15px; color: var(--text-muted); text-decoration: none; font-size: 0.8rem;
-        }
-        .btn-cancel:hover { color: white; }
     </style>
 </head>
 <body>
@@ -95,10 +89,10 @@
 <div id="setup-container">
     <div class="profile-card">
         <div class="icon-box">
-            <i data-lucide="user-cog" size="32" id="headerIcon"></i>
+            <i data-lucide="user-cog" size="32"></i>
         </div>
-        <h1 id="pageTitle">Profile Setup</h1>
-        <p class="subtitle" id="pageSubtitle">Complete your professional credentials.</p>
+        <h1>Profile Setup</h1>
+        <p class="subtitle">Complete your professional credentials.</p>
 
         <form id="profileForm">
             <div class="form-grid">
@@ -109,7 +103,7 @@
 
                 <div class="form-group full-width">
                     <label>Institutional Email</label>
-                    <input type="email" id="facultyEmail" readonly title="Email cannot be changed">
+                    <input type="email" id="facultyEmail" readonly>
                 </div>
 
                 <div class="form-group">
@@ -129,7 +123,6 @@
                         <option value="Computer Science">Computer Science</option>
                         <option value="Information Technology">Information Technology</option>
                         <option value="Engineering">Engineering</option>
-                        <option value="Mathematics">Mathematics</option>
                     </select>
                 </div>
 
@@ -145,7 +138,6 @@
             </div>
 
             <button type="submit" class="btn-save" id="saveBtn">Finalize Profile</button>
-            <a href="faculty-dashboard.html" class="btn-cancel" id="cancelBtn" style="display: none;">Cancel Changes</a>
         </form>
     </div>
 </div>
@@ -177,46 +169,25 @@
         // Set email field immediately
         document.getElementById("facultyEmail").value = user.email;
 
-        // CHECK MODE: Check if we are in Edit Mode or Initial Setup
-        const urlParams = new URLSearchParams(window.location.search);
-        const isEditMode = urlParams.get('mode') === 'edit';
-
         const userDoc = await getDoc(doc(db, "users", user.uid));
         
         if (userDoc.exists()) {
             const data = userDoc.data();
-
-            // Populate existing values regardless of mode
-            if (data.name) document.getElementById("facultyName").value = data.name;
-            if (data.designation) document.getElementById("designation").value = data.designation;
-            if (data.department) document.getElementById("department").value = data.department;
-            if (data.employeeId) document.getElementById("employeeId").value = data.employeeId;
-            if (data.experience) document.getElementById("experience").value = data.experience;
             
-            // IF NOT EDIT MODE: Check if profile is complete to auto-redirect
-            if (!isEditMode && data.profileCompleted && data.designation && data.experience) {
+            // Redirect if profile is already complete with all fields
+            if (data.profileCompleted && data.designation && data.experience) {
                 window.location.replace("faculty-dashboard.html");
                 return;
             }
-
-            // IF EDIT MODE: Update UI elements
-            if (isEditMode) {
-                document.getElementById("pageTitle").innerText = "Update Profile";
-                document.getElementById("pageSubtitle").innerText = "Modify your professional information.";
-                document.getElementById("saveBtn").innerText = "Save Changes";
-                document.getElementById("cancelBtn").style.display = "inline-block";
-            }
         }
         
-        // Show container only after logic check
         document.getElementById("setup-container").style.display = "block";
     });
 
     document.getElementById("profileForm").addEventListener("submit", async (e) => {
         e.preventDefault();
         const saveBtn = document.getElementById("saveBtn");
-        const originalText = saveBtn.innerText;
-        saveBtn.innerText = "SYNCHRONIZING...";
+        saveBtn.innerText = "SAVING CREDENTIALS...";
         saveBtn.disabled = true;
 
         const profileData = {
@@ -231,12 +202,12 @@
 
         try {
             await updateDoc(doc(db, "users", auth.currentUser.uid), profileData);
-            alert("Profile successfully updated.");
+            alert("Terminal Setup Complete.");
             window.location.replace("faculty-dashboard.html");
         } catch (error) {
-            console.error("Update Error:", error);
-            alert("Critical Failure: " + error.message);
-            saveBtn.innerText = originalText;
+            console.error("Setup Error:", error);
+            alert("Error: " + error.message);
+            saveBtn.innerText = "Finalize Profile";
             saveBtn.disabled = false;
         }
     });
