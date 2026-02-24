@@ -34,7 +34,7 @@
         .nav-item {
             display: flex; align-items: center; gap: 15px; padding: 16px 20px;
             color: var(--text-dim); text-decoration: none; border-radius: 12px;
-            margin-bottom: 8px; transition: 0.3s; font-weight: 500; cursor: pointer;
+            margin-bottom: 8px; transition: 0.3s; font-weight: 500;
         }
         .nav-item:hover, .nav-item.active { background: rgba(212, 175, 55, 0.1); color: var(--gold); }
 
@@ -63,14 +63,16 @@
         .btn-launch { 
             width: 100%; padding: 14px; border-radius: 12px; background: var(--gold); color: black; 
             font-weight: 800; border: none; cursor: pointer; transition: 0.3s; margin-top: 20px;
-            display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         .btn-launch:hover:not(:disabled) { background: #fff; transform: scale(1.02); box-shadow: 0 0 20px var(--gold-glow); }
         .btn-launch:disabled { background: #1a1a1a; color: #444; cursor: not-allowed; }
 
+        /* Animations */
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
+        /* Empty State */
         .empty-state { grid-column: 1/-1; text-align: center; padding: 60px; background: var(--glass); border-radius: 30px; border: 1px dashed var(--border); }
     </style>
 </head>
@@ -81,7 +83,7 @@
         <nav class="nav-links">
             <a href="#" class="nav-item active"><i data-lucide="layout-grid"></i> Dashboard</a>
             <a href="results.html" class="nav-item"><i data-lucide="award"></i> My Scores</a>
-            <a href="sprofile.html?mode=edit" class="nav-item"><i data-lucide="user"></i> Edit Profile</a>
+            <a href="sprofile.html" class="nav-item"><i data-lucide="user"></i> Profile</a>
         </nav>
         <div class="nav-item" id="logout-btn" style="color: var(--danger); cursor: pointer; margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px;">
             <i data-lucide="log-out"></i> Logout
@@ -119,7 +121,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, where, onSnapshot, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -134,34 +136,25 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        onAuthStateChanged(auth, async (user) => {
+        onAuthStateChanged(auth, (user) => {
             if (user) {
-                // FETCH STUDENT DATA FOR NAME
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    document.getElementById('user-name').innerText = userData.name || user.displayName?.split(' ')[0] || "Candidate";
-                } else {
-                    document.getElementById('user-name').innerText = user.displayName?.split(' ')[0] || "Candidate";
-                }
-                
+                document.getElementById('user-name').innerText = user.displayName?.split(' ')[0] || "Candidate";
                 fetchAnalytics(user.uid);
                 initDashboard(user.uid);
             } else {
-                window.location.href = "slog.html";
+                window.location.href = "flog.html";
             }
         });
 
         async function fetchAnalytics(uid) {
-            const q = query(collection(db, "submissions"), where("studentId", "==", uid));
+            const q = query(collection(db, "test_submissions"), where("studentId", "==", uid));
             const snap = await getDocs(q);
             document.getElementById('completed-count').innerText = snap.size;
             
             let totalScore = 0;
             snap.forEach(doc => {
                 const data = doc.data();
-                // Ensure correct score calculation based on your DB fields
-                totalScore += (data.score || 0);
+                totalScore += (data.score / (data.total || 100)) * 100;
             });
             const avg = snap.size > 0 ? Math.round(totalScore / snap.size) : 0;
             document.getElementById('avg-score').innerText = avg + "%";
@@ -171,17 +164,13 @@
             const container = document.getElementById('test-container');
             
             // Step 1: Get user's completed test IDs
-            const subQuery = query(collection(db, "submissions"), where("studentId", "==", uid));
+            const subQuery = query(collection(db, "test_submissions"), where("studentId", "==", uid));
             
             onSnapshot(subQuery, (subSnap) => {
                 const completedIds = subSnap.docs.map(doc => doc.data().testId);
                 
-                // Step 2: Get active tests assigned to this student
-                const testQuery = query(collection(db, "tests"), 
-                    where("status", "==", "active"),
-                    where("assignedTo", "array-contains", uid)
-                );
-
+                // Step 2: Get active tests from faculty
+                const testQuery = query(collection(db, "tests"), where("status", "==", "active"));
                 onSnapshot(testQuery, (snap) => {
                     container.innerHTML = "";
                     let pendingCount = 0;
@@ -202,9 +191,10 @@
                         const isDone = completedIds.includes(doc.id);
                         if(!isDone) pendingCount++;
 
-                        let targetPage = "take-test.html"; 
-                        if(test.category?.toLowerCase() === "coding") targetPage = "student-compiler.html";
-                        if(test.category?.toLowerCase() === "mock") targetPage = "student-test-view.html";
+                        // Logic to decide where to send the student
+                        let targetPage = "student-test-view.html"; // Default
+                        if(test.category === "Coding") targetPage = "student-compiler.html";
+                        if(test.category === "Aptitude") targetPage = "aptitude-view.html";
 
                         const card = document.createElement('div');
                         card.className = `test-card ${isDone ? 'card-done' : ''}`;
@@ -212,19 +202,17 @@
                             <span class="status-pill ${isDone ? 'pill-done' : 'pill-active'}">
                                 ${isDone ? 'COMPLETED' : 'ACTIVE NOW'}
                             </span>
-                            <p style="color: var(--gold); font-weight: 800; font-size: 0.75rem; margin-bottom: 10px; letter-spacing: 1px;">${(test.category || "GENERAL").toUpperCase()}</p>
+                            <p style="color: var(--gold); font-weight: 800; font-size: 0.75rem; margin-bottom: 10px; letter-spacing: 1px;">${test.category.toUpperCase()}</p>
                             <h3 style="margin-bottom: 15px; font-size: 1.3rem;">${test.title}</h3>
                             
                             <div style="display: flex; gap: 20px; color: var(--text-dim); font-size: 0.85rem; margin-bottom: 5px;">
-                                <span style="display:flex; align-items:center; gap:5px;"><i data-lucide="clock" size="14"></i> ${test.duration || 60}m</span>
-                                <span style="display:flex; align-items:center; gap:5px;"><i data-lucide="help-circle" size="14"></i> ${test.questions?.length || 0} Qs</span>
+                                <span style="display:flex; align-items:center; gap:5px;"><i data-lucide="clock" size="14"></i> ${test.duration || test.timeLimit}m</span>
+                                <span style="display:flex; align-items:center; gap:5px;"><i data-lucide="bar-chart" size="14"></i> ${test.difficulty || 'General'}</span>
                             </div>
 
-                            <a href="${isDone ? '#' : targetPage + '?id=' + doc.id}" 
-                               class="btn-launch ${isDone ? 'disabled' : ''}" 
-                               ${isDone ? 'style="pointer-events: none; opacity: 0.5;"' : ''}>
-                                ${isDone ? '<i data-lucide="lock" size="16"></i> ATTEMPTED' : 'LAUNCH MISSION <i data-lucide="chevron-right" size="18"></i>'}
-                            </a>
+                            <button class="btn-launch" ${isDone ? 'disabled' : ''} onclick="window.location.href='${targetPage}?id=${doc.id}'">
+                                ${isDone ? '<i data-lucide="lock" size="16"></i> ATTEMPTED' : 'LAUNCH TERMINAL <i data-lucide="chevron-right" size="18"></i>'}
+                            </button>
                         `;
                         container.appendChild(card);
                     });
@@ -235,7 +223,7 @@
         }
 
         document.getElementById('logout-btn').onclick = () => {
-            if(confirm("Logout from Mission Control?")) signOut(auth).then(() => window.location.href="slog.html");
+            if(confirm("Logout from Mission Control?")) signOut(auth);
         };
         lucide.createIcons();
     </script>
