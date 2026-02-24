@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireX | Coding Challenge Deployment</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --bg: #080808;
+            --card: #0c0c0c;
+            --input-bg: #050505;
+            --border: #1a1a1a;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: white; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+
+        .deploy-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 35px; }
+        .header i { color: var(--gold); }
+        
+        .input-group { margin-bottom: 25px; }
+        label { display: block; margin-bottom: 10px; font-size: 0.75rem; color: var(--gold); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        
+        input, textarea, select {
+            width: 100%; background: var(--input-bg); border: 1px solid var(--border); padding: 15px; color: white; border-radius: 8px; outline: none; font-size: 0.9rem;
+        }
+
+        .lang-options {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; background: var(--input-bg); padding: 15px; border-radius: 8px; border: 1px solid var(--border);
+        }
+        .lang-item { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+        .lang-item input { width: auto; accent-color: var(--gold); }
+
+        .flex-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        .deploy-btn {
+            background: var(--gold); color: black; border: none; padding: 18px; width: 100%; border-radius: 10px; font-weight: 800; cursor: pointer; font-size: 1rem; margin-top: 10px; transition: 0.3s;
+        }
+        .deploy-btn:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .deploy-btn:disabled { background: #444; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+    <div class="deploy-container">
+        <div class="header">
+            <i data-lucide="code-2" size="32"></i>
+            <h2>Coding Challenge Deployment</h2>
+        </div>
+
+        <div class="input-group">
+            <label>Problem Title</label>
+            <input type="text" id="codeTitle" placeholder="e.g. Find duplicates in an array">
+        </div>
+
+        <div class="input-group">
+            <label>Problem Description</label>
+            <textarea id="codeDesc" rows="4" placeholder="Describe the logic and constraints..."></textarea>
+        </div>
+
+        <div class="input-group">
+            <label>Allowed Languages</label>
+            <div class="lang-options">
+                <label class="lang-item"><input type="checkbox" class="lang-check" value="c"> <span>C</span></label>
+                <label class="lang-item"><input type="checkbox" class="lang-check" value="cpp" checked> <span>C++</span></label>
+                <label class="lang-item"><input type="checkbox" class="lang-check" value="java" checked> <span>Java</span></label>
+                <label class="lang-item"><input type="checkbox" class="lang-check" value="python" checked> <span>Python</span></label>
+            </div>
+        </div>
+
+        <div class="flex-row">
+            <div class="input-group">
+                <label>Example Input</label>
+                <input type="text" id="exampleInput" placeholder="e.g. [1, 2, 2, 3]">
+            </div>
+            <div class="input-group">
+                <label>Example Output</label>
+                <input type="text" id="exampleOutput" placeholder="e.g. 2">
+            </div>
+        </div>
+
+        <div class="flex-row">
+            <div class="input-group">
+                <label>Duration (Mins)</label>
+                <input type="number" id="timeLimit" value="45">
+            </div>
+            <div class="input-group">
+                <label>Difficulty</label>
+                <select id="difficulty">
+                    <option value="Easy">Easy</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Hard">Hard</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="deploy-btn" id="deployBtn">Deploy to Student Terminal</button>
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = { 
+        apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", 
+        authDomain: "hirex-73d04.firebaseapp.com", 
+        projectId: "hirex-73d04", 
+        storageBucket: "hirex-73d04.firebasestorage.app", 
+        appId: "1:435154197357:web:5dbce3288c6a2771685864" 
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById('deployBtn').onclick = async () => {
+        const btn = document.getElementById('deployBtn');
+        
+        // 1. Check if values are being picked up
+        const title = document.getElementById('codeTitle').value;
+        const desc = document.getElementById('codeDesc').value;
+        const selectedLangs = Array.from(document.querySelectorAll('.lang-check:checked')).map(cb => cb.value);
+
+        console.log("Attempting to save:", { title, desc, selectedLangs });
+
+        if(!title || !desc) {
+            alert("Title and Description are empty!");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        try {
+            // 2. Add to Firestore
+            const docRef = await addDoc(collection(db, "tests"), {
+                title: title,
+                description: desc,
+                allowedLanguages: selectedLangs,
+                exampleInput: document.getElementById('exampleInput').value || "",
+                exampleOutput: document.getElementById('exampleOutput').value || "",
+                duration: document.getElementById('timeLimit').value || "0",
+                difficulty: document.getElementById('difficulty').value,
+                category: "Coding",
+                status: "active",
+                createdAt: serverTimestamp()
+            });
+
+            console.log("Document written with ID: ", docRef.id);
+            alert("Success! Data saved in Firebase.");
+            window.location.href = "faculty-dashboard.html";
+            
+        } catch (error) {
+            // 3. Catch exact error
+            console.error("Firebase Error Details:", error);
+            alert("Error: " + error.message);
+            btn.disabled = false;
+            btn.innerText = "Deploy to Student Terminal";
+        }
+    };
+</script>
+</body>
+</html>

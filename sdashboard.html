@@ -10,106 +10,70 @@
     <style>
         :root {
             --gold: #D4AF37;
-            --gold-glow: rgba(212, 175, 55, 0.3);
-            --bg: #000000;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --bg: #050505;
             --sidebar: #080808;
             --card-bg: #111111;
-            --border: rgba(212, 175, 55, 0.2);
+            --border: rgba(212, 175, 55, 0.15);
             --text-main: #FFFFFF;
             --text-dim: #888888;
             --success: #22c55e;
+            --danger: #ef4444;
+            --glass: rgba(255, 255, 255, 0.03);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; display: flex; height: 100vh; overflow: hidden; }
 
-        /* Sidebar Navigation */
+        /* Sidebar */
         aside {
-            width: 280px;
-            background: var(--sidebar);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            padding: 40px 20px;
+            width: 280px; background: var(--sidebar); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; padding: 40px 20px;
         }
-
-        .logo { font-family: 'Poppins', sans-serif; color: var(--gold); font-size: 2rem; margin-bottom: 60px; text-align: center; letter-spacing: 3px; }
-        
-        .nav-links { flex: 1; }
+        .logo { font-family: 'Poppins', sans-serif; color: var(--gold); font-size: 2.2rem; margin-bottom: 50px; text-align: center; letter-spacing: 4px; text-shadow: 0 0 15px var(--gold-glow); }
         .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 16px 20px;
-            color: var(--text-dim);
-            text-decoration: none;
-            border-radius: 14px;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-            font-weight: 500;
+            display: flex; align-items: center; gap: 15px; padding: 16px 20px;
+            color: var(--text-dim); text-decoration: none; border-radius: 12px;
+            margin-bottom: 8px; transition: 0.3s; font-weight: 500;
         }
         .nav-item:hover, .nav-item.active { background: rgba(212, 175, 55, 0.1); color: var(--gold); }
 
-        /* Main Content */
-        main { flex: 1; overflow-y: auto; padding: 50px 6%; background: radial-gradient(circle at top right, #121212, #000); }
+        /* Main Layout */
+        main { flex: 1; overflow-y: auto; padding: 40px 5%; background: radial-gradient(circle at 90% 10%, #151515, #050505); }
+        
+        .top-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 40px; }
+        .stat-box { background: var(--card-bg); border: 1px solid var(--border); padding: 25px; border-radius: 20px; display: flex; align-items: center; gap: 20px; position: relative; overflow: hidden; }
+        .stat-box::after { content: ''; position: absolute; top: 0; right: 0; width: 100px; height: 100px; background: var(--gold-glow); filter: blur(60px); opacity: 0.2; }
+        .stat-icon { width: 50px; height: 50px; background: rgba(212, 175, 55, 0.1); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--gold); }
 
-        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-        .welcome-text h1 { font-family: 'Poppins', sans-serif; font-size: 2.2rem; }
-        .welcome-text span { color: var(--gold); }
-
-        /* Live Status Badge */
-        .status-badge { display: flex; align-items: center; gap: 8px; background: #111; padding: 10px 20px; border-radius: 50px; border: 1px solid var(--border); font-size: 0.75rem; font-weight: 800; color: var(--success); }
-        .dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); animation: pulse 2s infinite; }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        /* Terminal Grid */
-        .terminal-title { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; font-weight: 800; color: var(--gold); text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; }
-        .test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 30px; }
-
-        /* Test Card Styling */
+        /* Test Cards */
+        .test-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
         .test-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            padding: 35px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(145deg, #111111, #0a0a0a); border: 1px solid var(--border);
+            border-radius: 24px; padding: 30px; position: relative; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .test-card:hover { transform: translateY(-10px); border-color: var(--gold); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .test-card:hover { transform: translateY(-8px); border-color: var(--gold); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
         
-        .category-tag { font-size: 0.65rem; padding: 5px 14px; border-radius: 50px; background: rgba(212, 175, 55, 0.15); color: var(--gold); font-weight: 800; margin-bottom: 20px; display: inline-block; }
-        .test-card h3 { font-size: 1.4rem; margin-bottom: 12px; font-family: 'Poppins'; }
-        .test-info { color: var(--text-dim); font-size: 0.85rem; margin-bottom: 30px; display: flex; gap: 20px; }
+        .card-done { opacity: 0.7; filter: grayscale(0.5); border-color: #222; }
 
-        .btn-action {
-            width: 100%;
-            padding: 16px;
-            border-radius: 15px;
-            font-weight: 800;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: 0.3s;
-            text-decoration: none;
-            border: none;
+        .status-pill { position: absolute; top: 20px; right: 20px; font-size: 0.65rem; padding: 6px 12px; border-radius: 50px; font-weight: 800; letter-spacing: 1px; }
+        .pill-active { background: rgba(34, 197, 94, 0.1); color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
+        .pill-done { background: rgba(255, 255, 255, 0.1); color: #888; border: 1px solid rgba(255, 255, 255, 0.1); }
+
+        .btn-launch { 
+            width: 100%; padding: 14px; border-radius: 12px; background: var(--gold); color: black; 
+            font-weight: 800; border: none; cursor: pointer; transition: 0.3s; margin-top: 20px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
-        .btn-launch { background: var(--gold); color: black; box-shadow: 0 5px 15px var(--gold-glow); }
-        .btn-launch:hover { background: #fff; box-shadow: 0 8px 25px var(--gold); }
-        
-        .btn-done { background: #1a1a1a; color: #444; cursor: not-allowed; border: 1px solid #222; }
+        .btn-launch:hover:not(:disabled) { background: #fff; transform: scale(1.02); box-shadow: 0 0 20px var(--gold-glow); }
+        .btn-launch:disabled { background: #1a1a1a; color: #444; cursor: not-allowed; }
 
-        /* Right Sidebar - Activity */
-        .activity-panel { width: 320px; background: var(--sidebar); border-left: 1px solid var(--border); padding: 40px 25px; }
-        .activity-card { background: #121212; padding: 20px; border-radius: 18px; margin-bottom: 20px; border-left: 4px solid var(--gold); }
-        .activity-card h5 { font-size: 0.85rem; margin-bottom: 5px; }
-        .activity-card p { font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; }
+        /* Animations */
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* Loader */
-        #loader { text-align: center; padding: 50px; color: var(--gold); width: 100%; }
+        /* Empty State */
+        .empty-state { grid-column: 1/-1; text-align: center; padding: 60px; background: var(--glass); border-radius: 30px; border: 1px dashed var(--border); }
     </style>
 </head>
 <body>
@@ -117,64 +81,54 @@
     <aside>
         <div class="logo">HIREX</div>
         <nav class="nav-links">
-            <a href="#" class="nav-item active"><i data-lucide="layout-grid"></i> Terminal</a>
-            <a href="sprofile.html" class="nav-item"><i data-lucide="user-circle"></i> Profile</a>
-            <a href="#" class="nav-item"><i data-lucide="file-text"></i> My Results</a>
-            <a href="#" class="nav-item"><i data-lucide="briefcase"></i> Job Portal</a>
+            <a href="#" class="nav-item active"><i data-lucide="layout-grid"></i> Dashboard</a>
+            <a href="results.html" class="nav-item"><i data-lucide="award"></i> My Scores</a>
+            <a href="sprofile.html" class="nav-item"><i data-lucide="user"></i> Profile</a>
         </nav>
-        <a href="index.html" class="nav-item" style="color: #ef4444; margin-top: auto;"><i data-lucide="log-out"></i> Logout</a>
+        <div class="nav-item" id="logout-btn" style="color: var(--danger); cursor: pointer; margin-top: auto; border-top: 1px solid var(--border); padding-top: 20px;">
+            <i data-lucide="log-out"></i> Logout
+        </div>
     </aside>
 
     <main>
-        <header class="header-row">
-            <div class="welcome-text">
-                <p style="color: var(--text-dim); font-size: 0.9rem; margin-bottom: 5px;">February 24, 2026</p>
-                <h1>Welcome, <span id="student-name">Alex Sterling</span></h1>
-            </div>
-            <div class="status-badge">
-                <div class="dot"></div>
-                LIVE FEED ACTIVE
-            </div>
+        <header style="margin-bottom: 40px;">
+            <h1 style="font-size: 2.8rem; font-family: 'Poppins'; letter-spacing: -1px;">Welcome, <span id="user-name" style="color: var(--gold);">Explorer</span></h1>
+            <p style="color: var(--text-dim); font-size: 1.1rem;">You have <span id="test-count" style="color: white; font-weight: 600;">0</span> missions available.</p>
         </header>
 
-        <div class="terminal-title">
-            <i data-lucide="cpu" size="20"></i> Active Assessments
-        </div>
+        <section class="top-stats">
+            <div class="stat-box">
+                <div class="stat-icon"><i data-lucide="check-circle"></i></div>
+                <div><h4 id="completed-count" style="font-size: 1.5rem;">0</h4><p style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Completed</p></div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon"><i data-lucide="trending-up"></i></div>
+                <div><h4 id="avg-score" style="font-size: 1.5rem;">0%</h4><p style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">Avg Accuracy</p></div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-icon"><i data-lucide="shield-check"></i></div>
+                <div><h4 style="font-size: 1.5rem;">Active</h4><p style="font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase;">System Status</p></div>
+            </div>
+        </section>
 
         <div class="test-grid" id="test-container">
-            <div id="loader">
-                <i data-lucide="loader-2" class="spin"></i>
-                <p style="margin-top: 10px;">Synchronizing with HR Dashboard...</p>
+            <div style="grid-column: 1/-1; text-align: center; padding: 100px;">
+                <i data-lucide="loader-2" class="spin" size="40" style="color: var(--gold);"></i>
+                <p style="margin-top: 15px; color: var(--text-dim);">Syncing with Command Center...</p>
             </div>
         </div>
     </main>
 
-    <div class="activity-panel">
-        <h4 style="margin-bottom: 30px; letter-spacing: 1px; color: var(--text-dim); font-size: 0.8rem;">HR BROADCASTS</h4>
-        
-        <div class="activity-card">
-            <h5>Microsoft Recruitment</h5>
-            <p>Technical Assessment Round 1 is now live for all SDE applicants.</p>
-        </div>
-
-        <div class="activity-card" style="border-left-color: var(--success);">
-            <h5>System Alert</h5>
-            <p>Profile Strength increased to 85%. You are eligible for Google roles.</p>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, query, where, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // Your specific Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk",
             authDomain: "hirex-73d04.firebaseapp.com",
             projectId: "hirex-73d04",
             storageBucket: "hirex-73d04.firebasestorage.app",
-            messagingSenderId: "435154197357",
             appId: "1:435154197357:web:5dbce3288c6a2771685864"
         };
 
@@ -184,76 +138,94 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById('student-name').innerText = user.displayName || "Candidate";
-                initLiveDashboard(user.uid);
+                document.getElementById('user-name').innerText = user.displayName?.split(' ')[0] || "Candidate";
+                fetchAnalytics(user.uid);
+                initDashboard(user.uid);
             } else {
-                // If not logged in, redirect to login page
-                // window.location.href = "s-login.html"; 
-                console.log("No user session. Mocking with demo UID.");
-                initLiveDashboard("demo_user_id");
+                window.location.href = "flog.html";
             }
         });
 
-        async function initLiveDashboard(uid) {
+        async function fetchAnalytics(uid) {
+            const q = query(collection(db, "test_submissions"), where("studentId", "==", uid));
+            const snap = await getDocs(q);
+            document.getElementById('completed-count').innerText = snap.size;
+            
+            let totalScore = 0;
+            snap.forEach(doc => {
+                const data = doc.data();
+                totalScore += (data.score / (data.total || 100)) * 100;
+            });
+            const avg = snap.size > 0 ? Math.round(totalScore / snap.size) : 0;
+            document.getElementById('avg-score').innerText = avg + "%";
+        }
+
+        function initDashboard(uid) {
             const container = document.getElementById('test-container');
             
-            // 1. Fetch completed test IDs for this student to prevent retakes
-            const submissionsQuery = query(collection(db, "test_submissions"), where("studentId", "==", uid));
-            const subSnapshot = await getDocs(submissionsQuery);
-            const completedIds = subSnapshot.docs.map(doc => doc.data().testId);
-
-            // 2. Listen for Tests assigned by HR in REAL-TIME
-            const testsQuery = query(collection(db, "tests"), where("status", "==", "active"));
+            // Step 1: Get user's completed test IDs
+            const subQuery = query(collection(db, "test_submissions"), where("studentId", "==", uid));
             
-            onSnapshot(testsQuery, (snapshot) => {
-                container.innerHTML = ""; // Clear loader
+            onSnapshot(subQuery, (subSnap) => {
+                const completedIds = subSnap.docs.map(doc => doc.data().testId);
                 
-                if(snapshot.empty) {
-                    container.innerHTML = `<div style="color:#333; grid-column: 1/-1; text-align:center; padding-top:100px;">No tests currently assigned by HR.</div>`;
-                }
+                // Step 2: Get active tests from faculty
+                const testQuery = query(collection(db, "tests"), where("status", "==", "active"));
+                onSnapshot(testQuery, (snap) => {
+                    container.innerHTML = "";
+                    let pendingCount = 0;
 
-                snapshot.forEach((doc) => {
-                    const test = doc.data();
-                    const testId = doc.id;
-                    const isCompleted = completedIds.includes(testId);
+                    if(snap.empty) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i data-lucide="coffee" size="48" style="color: #444; margin-bottom: 20px;"></i>
+                                <h3 style="color: #666;">All clear! No pending assessments.</h3>
+                            </div>`;
+                        document.getElementById('test-count').innerText = "0";
+                        lucide.createIcons();
+                        return;
+                    }
 
-                    const card = `
-                        <div class="test-card">
-                            <span class="category-tag">${test.category.toUpperCase()}</span>
-                            <h3>${test.title}</h3>
-                            <div class="test-info">
-                                <span><i data-lucide="clock" size="14"></i> ${test.duration} Mins</span>
-                                <span><i data-lucide="help-circle" size="14"></i> ${test.questions ? test.questions.length : 0} MCQs</span>
-                            </div>
+                    snap.forEach(doc => {
+                        const test = doc.data();
+                        const isDone = completedIds.includes(doc.id);
+                        if(!isDone) pendingCount++;
+
+                        // Logic to decide where to send the student
+                        let targetPage = "student-test-view.html"; // Default
+                        if(test.category === "Coding") targetPage = "student-compiler.html";
+                        if(test.category === "Aptitude") targetPage = "aptitude-view.html";
+
+                        const card = document.createElement('div');
+                        card.className = `test-card ${isDone ? 'card-done' : ''}`;
+                        card.innerHTML = `
+                            <span class="status-pill ${isDone ? 'pill-done' : 'pill-active'}">
+                                ${isDone ? 'COMPLETED' : 'ACTIVE NOW'}
+                            </span>
+                            <p style="color: var(--gold); font-weight: 800; font-size: 0.75rem; margin-bottom: 10px; letter-spacing: 1px;">${test.category.toUpperCase()}</p>
+                            <h3 style="margin-bottom: 15px; font-size: 1.3rem;">${test.title}</h3>
                             
-                            ${isCompleted ? `
-                                <button class="btn-action btn-done" disabled>
-                                    <i data-lucide="check-circle" size="18"></i> ATTEMPTED
-                                </button>
-                            ` : `
-                                <button class="btn-action btn-launch" onclick="launchTest('${testId}')">
-                                    START ASSESSMENT <i data-lucide="play" size="18"></i>
-                                </button>
-                            `}
-                        </div>
-                    `;
-                    container.insertAdjacentHTML('beforeend', card);
+                            <div style="display: flex; gap: 20px; color: var(--text-dim); font-size: 0.85rem; margin-bottom: 5px;">
+                                <span style="display:flex; align-items:center; gap:5px;"><i data-lucide="clock" size="14"></i> ${test.duration || test.timeLimit}m</span>
+                                <span style="display:flex; align-items:center; gap:5px;"><i data-lucide="bar-chart" size="14"></i> ${test.difficulty || 'General'}</span>
+                            </div>
+
+                            <button class="btn-launch" ${isDone ? 'disabled' : ''} onclick="window.location.href='${targetPage}?id=${doc.id}'">
+                                ${isDone ? '<i data-lucide="lock" size="16"></i> ATTEMPTED' : 'LAUNCH TERMINAL <i data-lucide="chevron-right" size="18"></i>'}
+                            </button>
+                        `;
+                        container.appendChild(card);
+                    });
+                    document.getElementById('test-count').innerText = pendingCount;
+                    lucide.createIcons();
                 });
-                lucide.createIcons();
             });
         }
 
-        window.launchTest = (id) => {
-            // Redirect to the Secure Exam Hall
-            window.location.href = `student-test-view.html?id=${id}`;
+        document.getElementById('logout-btn').onclick = () => {
+            if(confirm("Logout from Mission Control?")) signOut(auth);
         };
-
         lucide.createIcons();
     </script>
-
-    <style>
-        .spin { animation: rotation 2s infinite linear; }
-        @keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(350deg); } }
-    </style>
 </body>
 </html>
