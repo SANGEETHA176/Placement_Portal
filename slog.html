@@ -146,9 +146,33 @@
             display: none;
             text-align: center;
         }
+
+        .loader-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(212, 175, 55, 0.3);
+            border-top: 3px solid var(--brand-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
+
+<div class="loader-overlay" id="loader">
+    <div class="spinner"></div>
+    <p style="margin-top: 15px; color: var(--brand-gold); font-size: 0.8rem; letter-spacing: 2px;">SECURE REDIRECT...</p>
+</div>
 
 <div class="top-nav">
     <a href="home.html" class="btn-back">
@@ -181,9 +205,9 @@
     </form>
 
     <a href="forget-password.html" class="forget-link">Forgot your credentials?</a>
-    <p class="text-xs text-gray-500 mt-4">
+    <p style="font-size: 0.8rem; color: #555; margin-top: 15px;">
         New here? 
-        <a href="ssignup.html" style="color: var(--brand-gold); text-decoration: none;">
+        <a href="ssignup.html" style="color: var(--brand-gold); text-decoration: none; font-weight: 600;">
             Create Account
         </a>
     </p>
@@ -210,15 +234,13 @@ const db = getFirestore(app);
 const loginForm = document.getElementById("loginForm");
 const loginBtn = document.getElementById("loginBtn");
 const errorDisplay = document.getElementById("error-message");
+const loader = document.getElementById("loader");
 
 loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
     loginBtn.innerText = "Verifying...";
     loginBtn.disabled = true;
@@ -237,19 +259,25 @@ loginForm.addEventListener("submit", async (e) => {
 
         const userData = userDoc.data();
 
+        // Check if student
         if (userData.role !== "student") {
             await signOut(auth);
             return showError("Access Denied: Student portal only.");
         }
 
-        if (!user.emailVerified) {
-            await signOut(auth);
-            return showError("Please verify your email before logging in.");
+        // Show Loader for smooth transition
+        loader.style.display = "flex";
+        
+        // --- SMART REDIRECT LOGIC ---
+        // If profileComplete is TRUE, go to Dashboard. Else, go to Profile setup.
+        if (userData.profileComplete === true) {
+            setTimeout(() => { window.location.href = "sdashboard.html"; }, 1200);
+        } else {
+            setTimeout(() => { window.location.href = "sprofile.html"; }, 1200);
         }
 
-        window.location.href = "student-dashboard.html";
-
     } catch (error) {
+        console.error(error);
         showError("Invalid email or password.");
     }
 });
@@ -259,6 +287,7 @@ function showError(message) {
     errorDisplay.style.display = "block";
     loginBtn.innerText = "Secure Access";
     loginBtn.disabled = false;
+    loader.style.display = "none";
 }
 
 lucide.createIcons();
