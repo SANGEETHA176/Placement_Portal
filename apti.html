@@ -96,100 +96,104 @@
         <p id="lockMessage" class="lock-msg"><i data-lucide="lock" size="14" style="vertical-align: middle; margin-right: 5px;"></i> All modules must be finalized to unlock</p>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", 
-            authDomain: "hirex-73d04.firebaseapp.com", 
-            projectId: "hirex-73d04", 
-            storageBucket: "hirex-73d04.firebasestorage.app", 
-            appId: "1:435154197357:web:5dbce3288c6a2771685864" 
-        };
+    const firebaseConfig = { 
+        apiKey: "AIzaSyB0aTzo7UoTRvYchcBQfy7eJZYl4S8vdTk", 
+        authDomain: "hirex-73d04.firebaseapp.com", 
+        projectId: "hirex-73d04", 
+        storageBucket: "hirex-73d04.firebasestorage.app", 
+        appId: "1:435154197357:web:5dbce3288c6a2771685864" 
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        // Updated Progress Check: Handles JSON objects correctly
-        function checkProgress() {
-            const modules = ['quants', 'logical', 'verbal'];
-            let completedCount = 0;
-
-            modules.forEach(m => {
-                const rawData = localStorage.getItem('test_' + m);
-                if (rawData) {
-                    try {
-                        // Whether it's the string "ready" or a full JSON string, we mark as completed
-                        document.getElementById('card-' + m).classList.add('completed');
-                        document.getElementById('status-' + m).innerText = 'Validated';
-                        document.getElementById('status-' + m).style.color = '#22c55e';
-                        completedCount++;
-                    } catch(e) { console.error("Marker error", e); }
-                }
-            });
-
-            if (completedCount === 3) {
-                document.getElementById('deployZone').style.display = 'block';
-                document.getElementById('lockMessage').style.display = 'none';
+    function checkProgress() {
+        const modules = ['quants', 'logical', 'verbal'];
+        let completedCount = 0;
+        modules.forEach(m => {
+            if (localStorage.getItem('test_' + m)) {
+                document.getElementById('card-' + m).classList.add('completed');
+                document.getElementById('status-' + m).innerText = 'Validated';
+                document.getElementById('status-' + m).style.color = '#22c55e';
+                completedCount++;
             }
+        });
+        if (completedCount === 3) {
+            document.getElementById('deployZone').style.display = 'block';
+            document.getElementById('lockMessage').style.display = 'none';
         }
+    }
 
-        window.goToTest = (type) => {
-            window.location.href = `create-test.html?type=${type}`;
-        };
+    window.goToTest = (type) => {
+        window.location.href = `create-test.html?type=${type}`;
+    };
 
-        document.getElementById('deployBtn').onclick = async () => {
-            const btn = document.getElementById('deployBtn');
-            btn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> MERGING CLOUD DATA...`;
-            btn.disabled = true;
-            lucide.createIcons();
-
-            try {
-                // FETCHING FRESH DATA FROM FIREBASE (Safer than LocalStorage)
-                const fetchModule = async (cat) => {
-                    const docRef = doc(db, "test_drafts", `draft_${cat}`);
-                    const snap = await getDoc(docRef);
-                    if (!snap.exists()) throw new Error(`${cat} draft not found on server!`);
-                    return snap.data().questions;
-                };
-
-                const quantsQ = await fetchModule('quants');
-                const logicalQ = await fetchModule('logical');
-                const verbalQ = await fetchModule('verbal');
-
-                const allQuestions = [...quantsQ, ...logicalQ, ...verbalQ];
-
-                const finalAssessment = {
-                    title: "HireX Global Aptitude Assessment",
-                    totalQuestions: allQuestions.length,
-                    duration: 60, 
-                    questions: allQuestions,
-                    status: "active",
-                    createdAt: serverTimestamp(),
-                    passScore: Math.floor(allQuestions.length * 0.6)
-                };
-
-                // PUSH TO THE OFFICIAL TESTS COLLECTION
-                await addDoc(collection(db, "tests"), finalAssessment);
-                
-                alert("🚀 SUCCESS! The combined assessment is now live for all students.");
-
-                // Cleanup
-                ['quants', 'logical', 'verbal'].forEach(m => localStorage.removeItem('test_' + m));
-                window.location.href = 'faculty-dashboard.html';
-
-            } catch (err) {
-                console.error(err);
-                alert("Deployment Error: " + err.message);
-                btn.innerText = "INITIALIZE DEPLOYMENT";
-                btn.disabled = false;
-                lucide.createIcons();
-            }
-        };
-
-        window.onload = checkProgress;
+    document.getElementById('deployBtn').onclick = async () => {
+        const btn = document.getElementById('deployBtn');
+        btn.innerHTML = `<i data-lucide="loader-2" class="spin"></i> MERGING & ASSIGNING...`;
+        btn.disabled = true;
         lucide.createIcons();
-    </script>
+
+        try {
+            // 1. Fetch Draft Data
+            const fetchModule = async (cat) => {
+                const docRef = doc(db, "test_drafts", `draft_${cat}`);
+                const snap = await getDoc(docRef);
+                if (!snap.exists()) throw new Error(`${cat} draft not found on server!`);
+                return snap.data().questions;
+            };
+
+            const quantsQ = await fetchModule('quants');
+            const logicalQ = await fetchModule('logical');
+            const verbalQ = await fetchModule('verbal');
+            const allQuestions = [...quantsQ, ...logicalQ, ...verbalQ];
+
+            // 2. CRITICAL: Fetch all Students to assign the test to
+            const studentQuery = query(collection(db, "users"), where("role", "==", "student"));
+            const studentSnap = await getDocs(studentQuery);
+            const studentIds = studentSnap.docs.map(doc => doc.id);
+
+            if (studentIds.length === 0) {
+                console.warn("No students found in 'users' collection to assign this test to.");
+            }
+
+            // 3. Construct Final Assessment with Category for Dashboard Sorting
+            const finalAssessment = {
+                title: "HireX Global Aptitude Assessment",
+                category: "aptitude", // Added for filtering
+                totalQuestions: allQuestions.length,
+                duration: 60, 
+                questions: allQuestions,
+                status: "active",
+                assignedTo: studentIds, // FIX: Dashboard now sees this
+                createdAt: serverTimestamp(),
+                passScore: Math.floor(allQuestions.length * 0.6)
+            };
+
+            // 4. Push to Official Tests
+            await addDoc(collection(db, "tests"), finalAssessment);
+            
+            alert("🚀 DEPLOYED! Assessment is now visible to " + studentIds.length + " students.");
+
+            // Cleanup
+            ['quants', 'logical', 'verbal'].forEach(m => localStorage.removeItem('test_' + m));
+            window.location.href = 'faculty-dashboard.html';
+
+        } catch (err) {
+            console.error(err);
+            alert("Deployment Error: " + err.message);
+            btn.innerText = "DEPLOY TO STUDENTS";
+            btn.disabled = false;
+            lucide.createIcons();
+        }
+    };
+
+    window.onload = checkProgress;
+    lucide.createIcons();
+</script>
 </body>
 </html>
